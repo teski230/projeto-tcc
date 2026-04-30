@@ -1,0 +1,196 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API Lanchonete TCC",
+      "version": "1.0.0",
+      "description": "Documentação completa da API"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000"
+      }
+    ],
+    "paths": {
+      "/clientes": {
+        "get": {
+          "summary": "Lista todos os clientes",
+          "responses": {
+            "200": {
+              "description": "Lista de clientes"
+            }
+          }
+        }
+      },
+  
+      "/clientes/{id}": {
+        "get": {
+          "summary": "Busca cliente por ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Cliente encontrado"
+            },
+            "404": {
+              "description": "Cliente não encontrado"
+            }
+          }
+        }
+      },
+  
+      "/verProdutos": {
+        "get": {
+          "summary": "Lista todos os produtos",
+          "responses": {
+            "200": {
+              "description": "Lista de produtos"
+            }
+          }
+        }
+      },
+  
+      "/produtos/{id}": {
+        "get": {
+          "summary": "Busca produto por ID",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Produto encontrado"
+            },
+            "404": {
+              "description": "Produto não encontrado"
+            }
+          }
+        }
+      },
+  
+      "/pedidos": {
+        "get": {
+          "summary": "Lista todos os pedidos",
+          "responses": {
+            "200": {
+              "description": "Lista de pedidos"
+            }
+          }
+        },
+        "post": {
+          "summary": "Criar novo pedido",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "example": {
+                  "id_cliente": 1,
+                  "bairro": "Centro",
+                  "rua": "Rua A",
+                  "numero": "123",
+                  "complemento": "Casa",
+                  "valor": 50.0,
+                  "telefone": "18999999999",
+                  "status": "pendente",
+                  "forma_pagamento": "dinheiro",
+                  "troco_para": 100
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Pedido criado"
+            },
+            "500": {
+              "description": "Erro ao criar pedido"
+            }
+          }
+        }
+      },
+  
+      "/cadastro": {
+        "post": {
+          "summary": "Cadastrar cliente",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "example": {
+                  "nome": "Felipe",
+                  "email": "felipe@email.com",
+                  "senha": "123456"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Cliente cadastrado"
+            }
+          }
+        }
+      },
+  
+      "/entregadores": {
+        "post": {
+          "summary": "Cadastrar entregador",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "example": {
+                  "nome": "João",
+                  "email": "joao@email.com",
+                  "CNH": "123456789",
+                  "senha": "123456"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Entregador cadastrado"
+            }
+          }
+        }
+      },
+  
+      "/ADCprodutos": {
+        "post": {
+          "summary": "Cadastrar produto",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "example": {
+                  "nome": "X-Burguer",
+                  "descricao": "Hamburguer com queijo",
+                  "preco": 15.0,
+                  "categoria": "Lanche"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Produto cadastrado"
+            }
+          }
+        }
+      }
+    }
+  }

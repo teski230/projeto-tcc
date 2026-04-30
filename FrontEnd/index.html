@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rei do Rango</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      color: #000;
+    }
+
+    header {
+      height: 80px;
+      background-color: #eeecec;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 50px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .logo {
+      height: 120px;
+      object-fit: contain;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+    }
+
+    nav a {
+      color: #ff3131;
+      margin-left: 25px;
+      text-decoration: none;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      color: #000000;
+    }
+
+    .btn {
+      background: #ff3131;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: #ffffff;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #d62828;
+      transform: translateY(-2px);
+    }
+
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('Brabo.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      z-index: -1;
+    }
+
+    .hero h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 80px;
+      letter-spacing: 3px;
+      color: #ff3131;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      max-width: 600px;
+      color: #000;
+      font-size: 20px;
+    }
+
+    section {
+      padding: 120px 50px;
+    }
+
+    #sobre {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+
+    #sobre h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 55px;
+      color: #ff3131;
+      margin-bottom: 25px;
+      letter-spacing: 2px;
+    }
+
+    #sobre p {
+      max-width: 850px;
+      line-height: 1.8;
+      font-size: 18px;
+    }
+
+    #equipe {
+      text-align: center;
+    }
+
+    #equipe h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 50px;
+      color: #ff3131;
+      margin-bottom: 40px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 40px 20px;
+      border-radius: 15px;
+      transition: 0.3s;
+      color: white;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    /* SEÇÃO CADASTRO */
+    #cadastro {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 150px;
+    }
+
+    .download-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .titulo-download {
+      font-family: 'Bebas Neue', sans-serif;
+      color: #ff3131;
+      font-size: 45px;
+      letter-spacing: 2px;
+    }
+
+    .btn-download {
+      background-color: #ff3131;
+      color: #ffffff;
+      font-weight: 700;
+      padding: 15px 80px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 16px;
+    }
+
+    .btn-download:hover {
+      background-color: #000000;
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px;
+      background: #eeecec;
+      color: #ff3131;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo-container">
+    <img src="Rango.png" alt="Logo" class="logo">
+  </div>
+
+  <nav>
+    <a href="#sobre">Sobre</a>
+    <a href="#equipe">Equipe</a>
+    <a href="cadastro.html">Cadastro</a>
+    <a href="login.html">Login</a>
+    <a href="admin-login.html" class="btn">Administrador</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <h2>Rei do Rango</h2>
+  <p>Cada pedido vai além de um momento, é uma experiência gastronômica</p>
+</div>
+
+<section id="sobre">
+  <h1>Sobre Nós</h1>
+  <p>
+    Amigos desde a infância e desenvolvedores pelo SENAI,
+    Enzo e Felipe transformaram um desafio técnico em realidade gastronômica.
+    Ao notar que o mercado de hamburguerias dependia de sistemas alugados e caros,
+    a dupla desenvolveu, como TCC, uma plataforma própria e independente para o seu estabelecimento.
+  </p>
+</section>
+
+<section id="equipe">
+  <h2>Nossa Equipe</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Felipe</h3>
+      <p>Desenvolvedor</p>
+    </div>
+    <div class="card">
+      <h3>Enzo</h3>
+      <p>Designer</p>
+    </div>
+  </div>
+</section>
+
+<section id="cadastro">
+  <div class="download-container">
+    <h2 class="titulo-download">CRIE SUA CONTA</h2>
+
+    <!-- BOTÃO CORRIGIDO -->
+    <button type="button" class="btn-download" onclick="window.location.href='cadastro.html'">
+      Cadastrar agora
+    </button>
+
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Rei do Rango</p>
+</footer>
+
+</body>
+</html>

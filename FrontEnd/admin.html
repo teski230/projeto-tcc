@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins';
+}
+
+body {
+  display: flex;
+  background: #f5f5f5;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 230px;
+  height: 100vh;
+  background: #ff3131;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-family: 'Bebas Neue';
+  margin-bottom: 30px;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: none;
+  background: white;
+  color: #ff3131;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+h1 {
+  color: #ff3131;
+  margin-bottom: 20px;
+}
+
+/* CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 20px;
+}
+
+.card-dashboard {
+  background: white;
+  padding: 20px;
+  border-left: 6px solid #ff3131;
+  border-radius: 10px;
+}
+
+.card-dashboard p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* CLIENTES */
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+input {
+  padding: 6px;
+  margin-right: 5px;
+}
+
+.btn {
+  background: #ff3131;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>Admin</h2>
+  <button onclick="dashboard()">Dashboard</button>
+  <button onclick="listarClientes()">Clientes</button>
+  <button onclick="listarProdutos()">Produtos</button>
+  <button onclick="logout()">Sair</button>
+</div>
+
+<div class="main">
+  <h1>Painel do Administrador</h1>
+  <div id="conteudo"></div>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+
+if (!token) {
+  alert("Faça login");
+  window.location.href = "admin-login.html";
+}
+
+const payload = JSON.parse(atob(token.split('.')[1]));
+
+if (payload.role !== "admin") {
+  alert("Acesso negado");
+  window.location.href = "index.html";
+}
+
+// DASHBOARD
+async function dashboard() {
+  const clientes = await fetch("http://localhost:3000/clientes", {
+    headers: { Authorization: "Bearer " + token }
+  }).then(r => r.json());
+
+  const pedidos = await fetch("http://localhost:3000/pedidos", {
+    headers: { Authorization: "Bearer " + token }
+  }).then(r => r.json());
+
+  let total = pedidos.reduce((s, p) => s + Number(p.valor || 0), 0);
+
+  document.getElementById("conteudo").innerHTML = `
+    <div class="cards">
+      <div class="card-dashboard">
+        <h3>Clientes</h3>
+        <p>${clientes.length}</p>
+      </div>
+
+      <div class="card-dashboard">
+        <h3>Pedidos</h3>
+        <p>${pedidos.length}</p>
+      </div>
+
+      <div class="card-dashboard">
+        <h3>Vendas</h3>
+        <p>R$ ${total.toFixed(2)}</p>
+      </div>
+    </div>
+  `;
+}
+
+// CLIENTES
+async function listarClientes() {
+  const res = await fetch("http://localhost:3000/clientes", {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const dados = await res.json();
+
+  let html = "<h2>Clientes</h2>";
+
+  dados.forEach(c => {
+    html += `
+      <div class="card">
+        <div>
+          <input id="nome-${c.id_cliente}" value="${c.nome}">
+          <input id="email-${c.id_cliente}" value="${c.email}">
+        </div>
+
+        <button class="btn" onclick="editar(${c.id_cliente})">
+          Salvar
+        </button>
+      </div>
+    `;
+  });
+
+  document.getElementById("conteudo").innerHTML = html;
+}
+
+// EDITAR
+async function editar(id) {
+  const nome = document.getElementById(`nome-${id}`).value;
+  const email = document.getElementById(`email-${id}`).value;
+
+  await fetch(`http://localhost:3000/clientes/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ nome, email })
+  });
+
+  alert("Atualizado!");
+}
+
+// PRODUTOS
+async function listarProdutos() {
+  const res = await fetch("http://localhost:3000/verProdutos");
+  const dados = await res.json();
+
+  let html = "<h2>Produtos</h2>";
+
+  dados.forEach(p => {
+    html += `<div class="card">${p.nome} - R$ ${p.preco}</div>`;
+  });
+
+  document.getElementById("conteudo").innerHTML = html;
+}
+
+// LOGOUT
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "admin-login.html";
+}
+
+dashboard();
+</script>
+
+</body>
+</html>

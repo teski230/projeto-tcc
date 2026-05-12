@@ -304,6 +304,28 @@ app.delete('/DELprodutos/:id', autenticarToken, async (req, res) => {
     }
 });
 
+app.get('/verProdutos', async (req, res) => {
+
+    try {
+  
+      const [produtos] = await db.query(
+        'SELECT * FROM produtos'
+      );
+  
+      res.json(produtos);
+  
+    } catch (erro) {
+  
+      console.log(erro);
+  
+      res.status(500).json({
+        erro: 'Erro ao buscar produtos'
+      });
+  
+    }
+  
+  });
+
 // ==================== CLIENTES ====================
 
 // Listar todos os clientes (protegido)

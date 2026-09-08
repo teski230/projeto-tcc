@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins';
+}
+
+body {
+  display: flex;
+  background: #f5f5f5;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 230px;
+  height: 100vh;
+  background: #ff3131;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-family: 'Bebas Neue';
+  margin-bottom: 30px;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: none;
+  background: white;
+  color: #ff3131;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+h1 {
+  color: #ff3131;
+  margin-bottom: 20px;
+}
+
+/* CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 20px;
+}
+
+.card-dashboard {
+  background: white;
+  padding: 20px;
+  border-left: 6px solid #ff3131;
+  border-radius: 10px;
+}
+
+.card-dashboard p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* CLIENTES */
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+input {
+  padding: 6px;
+  margin-right: 5px;
+}
+
+.btn {
+  background: #ff3131;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* ENTREGADORES */
+.card-entregador {
+  background: white;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border-left: 6px solid #ff3131;
+}
+
+.card-entregador .info p {
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+.card-entregador .acoes {
+  margin-top: 10px;
+}
+
+.btn-aprovar {
+  background: #2ecc71;
+}
+
+.btn-recusar {
+  background: #ff3131;
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+}
+
+.badge-pendente { background: #f5a623; }
+.badge-aprovado { background: #2ecc71; }
+.badge-recusado { background: #ff3131; }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>Admin</h2>
+  <button onclick="dashboard()">Dashboard</button>
+  <button onclick="listarClientes()">Clientes</button>
+  <button onclick="listarProdutos()">Produtos</button>
+  <button onclick="listarEntregadores()">Entregadores</button>
+  <button onclick="logout()">Sair</button>
+</div>
+
+<div class="main">
+  <h1>Painel do Administrador</h1>
+  <div id="conteudo"></div>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+
+if (!token) {
+  alert("Faça login");
+  window.location.href = "admin-login.html";
+}
+
+const payload = JSON.parse(atob(token.split('.')[1]));
+
+if (payload.role !== "admin") {
+  alert("Acesso negado");
+  window.location.href = "index.html";
+}
+
+// DASHBOARD
+async function dashboard() {
+  const clientes = await fetch("http://localhost:3000/clientes", {
+    headers: { Authorization: "Bearer " + token }
+  }).then(r => r.json());
+
+  const pedidos = await fetch("http://localhost:3000/pedidos", {
+    headers: { Authorization: "Bearer " + token }
+  }).then(r => r.json());
+
+  let total = pedidos.reduce((s, p) => s + Number(p.valor || 0), 0);
+
+  document.getElementById("conteudo").innerHTML = `
+    <div class="cards">
+      <div class="card-dashboard">
+        <h3>Clientes</h3>
+        <p>${clientes.length}</p>
+      </div>
+
+      <div class="card-dashboard">
+        <h3>Pedidos</h3>
+        <p>${pedidos.length}</p>
+      </div>
+
+      <div class="card-dashboard">
+        <h3>Vendas</h3>
+        <p>R$ ${total.toFixed(2)}</p>
+      </div>
+    </div>
+  `;
+}
+
+// CLIENTES
+async function listarClientes() {
+  const res = await fetch("http://localhost:3000/clientes", {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const dados = await res.json();
+
+  let html = "<h2>Clientes</h2>";
+
+  dados.forEach(c => {
+    html += `
+      <div class="card">
+        <div>
+          <input id="nome-${c.id_cliente}" value="${c.nome}">
+          <input id="email-${c.id_cliente}" value="${c.email}">
+        </div>
+
+        <button class="btn" onclick="editar(${c.id_cliente})">
+          Salvar
+        </button>
+      </div>
+    `;
+  });
+
+  document.getElementById("conteudo").innerHTML = html;
+}
+
+// EDITAR
+async function editar(id) {
+  const nome = document.getElementById(`nome-${id}`).value;
+  const email = document.getElementById(`email-${id}`).value;
+
+  await fetch(`http://localhost:3000/clientes/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ nome, email })
+  });
+
+  alert("Atualizado!");
+}
+
+async function carregarCategorias(){
+
+    const res = await fetch("http://localhost:3000/categorias");
+
+    return await res.json();
+
+}
+
+async function listarProdutos() {
+
+  const res = await fetch("http://localhost:3000/produtos");
+  const produtos = await res.json();
+
+  let html = `
+    <h2>Produtos</h2>
+
+    <br>
+
+    <h3>Novo Produto</h3>
+
+    <div class="card">
+      <div>
+
+        <input id="novoNome" placeholder="Nome">
+
+        <input id="novoPreco" placeholder="Preço">
+
+        <input id="novaDescricao" placeholder="Descrição">
+
+        <input id="novaImagem" placeholder="URL da Imagem">
+
+        <input id="novaCategoria" placeholder="Categoria">
+
+      </div>
+
+      <button class="btn" onclick="adicionarProduto()">
+        Adicionar
+      </button>
+
+    </div>
+
+    <br>
+  `;
+
+  produtos.forEach(p => {
+
+    html += `
+      <div class="card">
+
+        <div>
+
+          <input id="nome-${p.id_produto}" value="${p.nome}">
+
+          <input
+    id="preco-${p.id_produto}"
+    type="number"
+    step="0.01"
+    min="0"
+    value="${p.preco}">
+
+          <input id="descricao-${p.id_produto}" value="${p.descricao}">
+
+          <input id="imagem-${p.id_produto}" value="${p.imagem}">
+
+          <select id="categoria-${p.id_produto}"></select>
+
+        </div>
+
+        <div>
+
+          <button class="btn" onclick="editarProduto(${p.id_produto})">
+            Salvar
+          </button>
+
+          <button class="btn" onclick="excluirProduto(${p.id_produto})">
+            Excluir
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  });
+
+  document.getElementById("conteudo").innerHTML = html;
+
+}
+
+async function adicionarProduto(){
+
+    const nome = document.getElementById("novoNome").value;
+    const preco = document.getElementById("novoPreco").value;
+    const descricao = document.getElementById("novaDescricao").value;
+    const imagem = document.getElementById("novaImagem").value;
+    const categoria = document.getElementById("novaCategoria").value;
+
+    await fetch("http://localhost:3000/produtos",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json",
+            "Authorization":"Bearer "+token
+        },
+
+        body:JSON.stringify({
+            nome,
+            preco,
+            descricao,
+            imagem,
+            categoria
+        })
+
+    });
+
+    alert("Produto cadastrado!");
+
+    listarProdutos();
+
+}
+
+async function editarProduto(id){
+
+    const nome=document.getElementById(`nome-${id}`).value;
+    const preco=document.getElementById(`preco-${id}`).value;
+    const descricao=document.getElementById(`descricao-${id}`).value;
+    const imagem=document.getElementById(`imagem-${id}`).value;
+    const categoria=document.getElementById(`categoria-${id}`).value;
+
+    await fetch(`http://localhost:3000/produtos/${id}`,{
+
+        method:"PUT",
+
+        headers:{
+            "Content-Type":"application/json",
+            "Authorization":"Bearer "+token
+        },
+
+        body:JSON.stringify({
+            nome,
+            preco,
+            descricao,
+            imagem,
+            categoria
+        })
+
+    });
+
+    alert("Produto atualizado!");
+
+    listarProdutos();
+
+}
+
+async function excluirProduto(id){
+
+    if(!confirm("Deseja excluir este produto?")) return;
+
+    await fetch(`http://localhost:3000/produtos/${id}`,{
+
+        method:"DELETE",
+
+        headers:{
+            "Authorization":"Bearer "+token
+        }
+
+    });
+
+    alert("Produto excluído!");
+
+    listarProdutos();
+
+}
+
+// ENTREGADORES
+async function listarEntregadores() {
+
+    try {
+
+        const res = await fetch("http://localhost:3000/entregadores", {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error("Erro ao buscar entregadores");
+        }
+
+        const entregadores = await res.json();
+
+        let html = `
+            <h2>Entregadores</h2>
+            <br>
+        `;
+
+        if (entregadores.length === 0) {
+
+            html += `
+                <div class="card">
+                    <p>Nenhum entregador cadastrado.</p>
+                </div>
+            `;
+
+        } else {
+
+            entregadores.forEach(e => {
+
+                html += `
+                    <div class="card-entregador">
+
+                        <div class="info">
+
+                            <p>
+                                <b>${e.nome}</b>
+                            </p>
+
+                            <p>
+                                Email: ${e.email}
+                            </p>
+
+                            <p>
+                                CNH: ${e.CNH || "Não informado"}
+                            </p>
+
+                            <p>
+                                Telefone: ${e.telefone || "Não informado"}
+                            </p>
+
+                            <p>
+                                Veículo: ${e.veiculo || "Não informado"}
+                            </p>
+
+                            <p>
+                                Placa: ${e.placa || "Não informado"}
+                            </p>
+
+                            <p>
+                                Status:
+                                <span class="badge badge-${e.status}">
+                                    ${e.status}
+                                </span>
+                            </p>
+
+                        </div>
+
+                        <div class="acoes">
+
+                            ${
+                                e.status === "pendente"
+                                ? `
+                                    <button
+                                        class="btn btn-aprovar"
+                                        onclick="aprovarEntregador(${e.id_entregador})">
+                                        Aprovar
+                                    </button>
+
+                                    <button
+                                        class="btn btn-recusar"
+                                        onclick="recusarEntregador(${e.id_entregador})">
+                                        Recusar
+                                    </button>
+                                `
+                                : ""
+                            }
+
+                        </div>
+
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById("conteudo").innerHTML = html;
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        document.getElementById("conteudo").innerHTML = `
+            <h2>Entregadores</h2>
+
+            <div class="card">
+                <p>Não foi possível carregar os entregadores.</p>
+                <p>Verifique se a API está funcionando.</p>
+            </div>
+        `;
+    }
+}
+
+// APROVAR ENTREGADOR
+async function aprovarEntregador(id) {
+
+    if (!confirm("Deseja aprovar este entregador?")) return;
+
+    try {
+
+        const res = await fetch(`http://localhost:3000/entregadores/${id}/aprovar`, {
+            method: "PUT",
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error("Erro ao aprovar entregador");
+        }
+
+        alert("Entregador aprovado!");
+
+        listarEntregadores();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert("Não foi possível aprovar o entregador.");
+    }
+}
+
+// RECUSAR ENTREGADOR
+async function recusarEntregador(id) {
+
+    if (!confirm("Deseja recusar este entregador?")) return;
+
+    try {
+
+        const res = await fetch(`http://localhost:3000/entregadores/${id}/recusar`, {
+            method: "PUT",
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error("Erro ao recusar entregador");
+        }
+
+        alert("Entregador recusado!");
+
+        listarEntregadores();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert("Não foi possível recusar o entregador.");
+    }
+}
+
+// LOGOUT
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "admin-login.html";
+}
+
+dashboard();
+</script>
+
+</body>
+</html>

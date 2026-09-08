@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Entregadores - Painel Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins';
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  background: #f5f5f5;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 230px;
+  height: 100vh;
+  background: #ff3131;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-family: 'Bebas Neue';
+  margin-bottom: 30px;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: none;
+  background: white;
+  color: #ff3131;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sidebar button.ativo {
+  background: #1a1a1a;
+  color: white;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+h1 {
+  color: #ff3131;
+  margin-bottom: 20px;
+}
+
+/* FILTROS */
+.filtros {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.filtro-btn {
+  padding: 8px 16px;
+  border: 2px solid #ff3131;
+  background: white;
+  color: #ff3131;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.filtro-btn.ativo {
+  background: #ff3131;
+  color: white;
+}
+
+/* ENTREGADORES */
+.card-entregador {
+  background: white;
+  padding: 15px 20px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border-left: 6px solid #ff3131;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-entregador .info p {
+  font-size: 14px;
+  margin: 2px 0;
+}
+
+.card-entregador .info p strong {
+  font-weight: 600;
+}
+
+.card-entregador .acoes {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+}
+
+.btn-aprovar {
+  background: #2ecc71;
+}
+
+.btn-recusar {
+  background: #ff3131;
+}
+
+.btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.badge-pendente {
+  background: #f5a623;
+}
+
+.badge-aprovado {
+  background: #2ecc71;
+}
+
+.badge-rejeitado {
+  background: #ff3131;
+}
+
+.vazio {
+  color: #000000;
+  padding: 20px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+  <h2>Admin</h2>
+
+  <button onclick="window.location.href='admin.html'">Dashboard</button>
+
+  <button onclick="window.location.href='admin.html'">Clientes</button>
+
+  <button onclick="window.location.href='admin.html'">Produtos</button>
+
+  <button class="ativo">Entregadores</button>
+
+  <button onclick="logout()">Sair</button>
+
+</div>
+
+<div class="main">
+
+  <h1>Entregadores</h1>
+
+  <div class="filtros">
+    <button class="filtro-btn ativo" data-filtro="todos" onclick="filtrar('todos')">Todos</button>
+    <button class="filtro-btn" data-filtro="pendente" onclick="filtrar('pendente')">Pendentes</button>
+    <button class="filtro-btn" data-filtro="aprovado" onclick="filtrar('aprovado')">Aprovados</button>
+    <button class="filtro-btn" data-filtro="rejeitado" onclick="filtrar('rejeitado')">Rejeitados</button>
+  </div>
+
+  <div id="conteudo"></div>
+
+</div>
+
+<script>
+
+const API_URL = "http://localhost:3000";
+
+const token = localStorage.getItem("token");
+
+if (!token) {
+  alert("Faça login");
+  window.location.href = "admin-login.html";
+}
+
+const payload = JSON.parse(atob(token.split('.')[1]));
+
+if (payload.role !== "admin") {
+  alert("Acesso negado");
+  window.location.href = "index.html";
+}
+
+let listaEntregadores = [];
+let filtroAtual = "todos";
+
+/* =========================
+   LISTAR ENTREGADORES
+========================= */
+
+async function listarEntregadores() {
+
+  try {
+
+    const res = await fetch(`${API_URL}/entregadores`, {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao buscar entregadores");
+    }
+
+    listaEntregadores = await res.json();
+
+    renderizar();
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    document.getElementById("conteudo").innerHTML =
+      `<p class="vazio">Não foi possível carregar os entregadores.</p>`;
+  }
+}
+
+/* =========================
+   FILTRAR
+========================= */
+
+function filtrar(status) {
+
+  filtroAtual = status;
+
+  document.querySelectorAll(".filtro-btn").forEach(btn => {
+    btn.classList.toggle("ativo", btn.dataset.filtro === status);
+  });
+
+  renderizar();
+}
+
+/* =========================
+   RENDERIZAR LISTA
+========================= */
+
+function renderizar() {
+
+  const dados = filtroAtual === "todos"
+    ? listaEntregadores
+    : listaEntregadores.filter(e => e.status === filtroAtual);
+
+  if (dados.length === 0) {
+    document.getElementById("conteudo").innerHTML =
+      `<p class="vazio">Nenhum entregador encontrado.</p>`;
+    return;
+  }
+
+  const badgeClasse = {
+    pendente: "badge-pendente",
+    aprovado: "badge-aprovado",
+    rejeitado: "badge-rejeitado"
+  };
+
+  let html = "";
+
+  dados.forEach(e => {
+
+    const podeAgir = e.status === "pendente";
+
+    html += `
+      <div class="card-entregador">
+
+        <div class="info">
+          <p><strong>${e.nome}</strong></p>
+          <p>Email: ${e.email}</p>
+          <p>CNH: ${e.CNH || "não tem"}</p>
+          <p>Status: <span class="badge ${badgeClasse[e.status] || ""}">${e.status}</span></p>
+        </div>
+
+        <div class="acoes">
+          <button
+            class="btn btn-aprovar"
+            ${podeAgir ? "" : "disabled"}
+            onclick="aprovarEntregador(${e.id_entregador})"
+          >
+            Aprovar
+          </button>
+
+          <button
+            class="btn btn-recusar"
+            ${podeAgir ? "" : "disabled"}
+            onclick="recusarEntregador(${e.id_entregador})"
+          >
+            Recusar
+          </button>
+        </div>
+
+      </div>
+    `;
+  });
+
+  document.getElementById("conteudo").innerHTML = html;
+}
+
+/* =========================
+   APROVAR ENTREGADOR
+========================= */
+
+async function aprovarEntregador(id) {
+
+  if (!confirm("Deseja aprovar este entregador?")) return;
+
+  try {
+
+    const res = await fetch(`${API_URL}/entregadores/${id}/aprovar`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao aprovar entregador");
+    }
+
+    alert("Entregador aprovado!");
+
+    listarEntregadores();
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    alert("Não foi possível aprovar o entregador.");
+  }
+}
+
+/* =========================
+   RECUSAR ENTREGADOR
+========================= */
+
+async function recusarEntregador(id) {
+
+  if (!confirm("Deseja recusar este entregador?")) return;
+
+  try {
+
+    const res = await fetch(`${API_URL}/entregadores/${id}/recusar`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao recusar entregador");
+    }
+
+    alert("Entregador recusado!");
+
+    listarEntregadores();
+
+  } catch (erro) {
+
+    console.error(erro);
+
+    alert("Não foi possível recusar o entregador.");
+  }
+}
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "admin-login.html";
+}
+
+/* =========================
+   INICIAR
+========================= */
+
+listarEntregadores();
+
+</script>
+
+</body>
+</html>

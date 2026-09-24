@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Carrinho | Rei do Rango</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#f5f5f5;
+    color:#222;
+}
+
+/* HEADER */
+header{
+    background:#ff0000;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 8%;
+    position:sticky;
+    top:0;
+    z-index:1000;
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+.logo img{
+    height:70px;
+    object-fit:contain;
+}
+
+nav{
+    display:flex;
+    gap:25px;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    font-weight:600;
+}
+
+nav a:hover{
+    opacity:.8;
+}
+
+.usuario{
+    display:flex;
+    align-items:center;
+}
+
+.btn-img{
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    position:relative;
+}
+
+.btn-img img{
+    width:50px;
+    display:block;
+}
+
+.contador-carrinho{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    background:white;
+    color:#ff0000;
+    min-width:23px;
+    height:23px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:bold;
+    border:2px solid #ff0000;
+}
+
+/* CONTEÚDO */
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:40px auto 70px;
+}
+
+.titulo{
+    margin-bottom:30px;
+}
+
+.titulo h1{
+    font-family:'Bebas Neue';
+    font-size:48px;
+    color:#222;
+}
+
+.titulo p{
+    color:#777;
+    margin-top:5px;
+}
+
+/* LAYOUT */
+.conteudo{
+    display:grid;
+    grid-template-columns:1fr 360px;
+    gap:30px;
+}
+
+/* PRODUTOS */
+.produtos{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.item{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    display:flex;
+    gap:20px;
+}
+
+.item-imagem{
+    width:150px;
+    height:130px;
+    flex-shrink:0;
+    border-radius:12px;
+    overflow:hidden;
+    background:#eee;
+}
+
+.item-imagem img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.item-info{
+    flex:1;
+}
+
+.item-info h2{
+    color:#ff3131;
+    font-size:22px;
+    margin-bottom:5px;
+}
+
+.preco-unitario{
+    color:#555;
+    font-size:14px;
+    margin-bottom:8px;
+}
+
+.adicionais{
+    color:#777;
+    font-size:13px;
+    margin-bottom:5px;
+}
+
+.observacao{
+    color:#777;
+    font-size:13px;
+    font-style:italic;
+    margin-bottom:15px;
+}
+
+.item-baixo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+
+.quantidade{
+    display:flex;
+    align-items:center;
+    border:1px solid #ddd;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+.quantidade button{
+    width:38px;
+    height:38px;
+    border:none;
+    background:white;
+    color:#ff3131;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.quantidade button:hover{
+    background:#fff0f0;
+}
+
+.quantidade span{
+    width:40px;
+    text-align:center;
+    font-weight:600;
+}
+
+.item-total{
+    font-size:20px;
+    font-weight:bold;
+    color:#222;
+}
+
+.remover{
+    border:none;
+    background:none;
+    color:#999;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.remover:hover{
+    color:#ff3131;
+}
+
+/* RESUMO */
+.resumo{
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    height:max-content;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    position:sticky;
+    top:120px;
+}
+
+.resumo h2{
+    font-family:'Bebas Neue';
+    font-size:30px;
+    margin-bottom:20px;
+}
+
+.linha{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:12px;
+    color:#555;
+}
+
+.linha.total{
+    border-top:1px solid #eee;
+    padding-top:18px;
+    margin-top:15px;
+    color:#222;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.total-valor{
+    color:#ff3131;
+}
+
+.btn-finalizar{
+    width:100%;
+    padding:15px;
+    margin-top:20px;
+    border:none;
+    border-radius:10px;
+    background:#ff3131;
+    color:white;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.btn-finalizar:hover{
+    background:#d62828;
+}
+
+.btn-voltar{
+    display:block;
+    text-align:center;
+    margin-top:15px;
+    color:#ff3131;
+    text-decoration:none;
+    font-weight:600;
+}
+
+/* ENDEREÇO */
+.endereco{
+    margin-top:30px;
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.endereco h2,
+.pagamento h2{
+    font-family:'Bebas Neue';
+    font-size:30px;
+    margin-bottom:20px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:15px;
+}
+
+.campo{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.campo label{
+    color:#555;
+    font-size:14px;
+    font-weight:600;
+}
+
+.campo input{
+    padding:13px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    outline:none;
+}
+
+.campo input:focus{
+    border-color:#ff3131;
+}
+
+.campo:nth-child(3){
+    grid-column:1 / -1;
+}
+
+/* PAGAMENTO */
+.pagamento{
+    margin-top:30px;
+    background:white;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.opcoes-pagamento{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.opcao{
+    border:2px solid #eee;
+    border-radius:10px;
+    padding:15px;
+    text-align:center;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.opcao input{
+    display:none;
+}
+
+.opcao.selecionada{
+    border-color:#ff3131;
+    background:#fff4f4;
+    color:#ff3131;
+}
+
+.troco{
+    display:none;
+    margin-top:15px;
+}
+
+.troco.mostrar{
+    display:block;
+}
+
+/* CARRINHO VAZIO */
+.vazio{
+    background:white;
+    border-radius:15px;
+    padding:60px 20px;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.vazio h2{
+    font-family:'Bebas Neue';
+    font-size:35px;
+    margin-bottom:10px;
+}
+
+.vazio p{
+    color:#777;
+    margin-bottom:25px;
+}
+
+.vazio a{
+    display:inline-block;
+    padding:13px 25px;
+    background:#ff3131;
+    color:white;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+}
+
+/* FOOTER */
+footer{
+    background:#222;
+    color:white;
+    text-align:center;
+    padding:25px;
+}
+
+/* RESPONSIVO */
+@media(max-width:900px){
+    header{
+        flex-direction:column;
+        gap:20px;
+    }
+
+    nav{
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+
+    .conteudo{
+        grid-template-columns:1fr;
+    }
+
+    .resumo{
+        position:static;
+    }
+}
+
+@media(max-width:600px){
+    .container{
+        width:94%;
+    }
+
+    .item{
+        flex-direction:column;
+    }
+
+    .item-imagem{
+        width:100%;
+        height:200px;
+    }
+
+    .item-baixo{
+        flex-wrap:wrap;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .campo:nth-child(3){
+        grid-column:auto;
+    }
+
+    .opcoes-pagamento{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        <img src="Rei do Rango (2).png" alt="Logo Rei do Rango">
+    </div>
+
+    <nav>
+        <a href="cardapio.html">Cardápio</a>
+        <a href="#">Meus Pedidos</a>
+        <a href="#">Perfil</a>
+    </nav>
+
+    <div class="usuario">
+        <button class="btn-img" onclick="window.location.href='carrinho.html'" title="Carrinho">
+            <img src="carrinho.png" alt="Carrinho">
+
+            <span id="contadorCarrinho" class="contador-carrinho">
+                0
+            </span>
+        </button>
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <div class="titulo">
+        <h1>Meu Carrinho</h1>
+        <p>Confira seus produtos antes de finalizar o pedido.</p>
+    </div>
+
+    <div id="areaCarrinho"></div>
+
+</main>
+
+
+<footer>
+    © 2026 Rei do Rango - Todos os direitos reservados.
+</footer>
+
+
+<script>
+
+let carrinho = JSON.parse(
+    localStorage.getItem("carrinho")
+) || [];
+
+const TAXA_ENTREGA = 5;
+
+
+/* ======================================================
+   FORMATAÇÃO
+====================================================== */
+
+function formatarPreco(valor){
+
+    return Number(valor)
+        .toFixed(2)
+        .replace(".", ",");
+
+}
+
+
+/* ======================================================
+   IMAGEM
+====================================================== */
+
+function pegarImagem(imagem){
+
+    if(!imagem){
+
+        return "https://via.placeholder.com/500x300?text=Rei+do+Rango";
+
+    }
+
+    if(imagem.startsWith("http")){
+
+        return imagem;
+
+    }
+
+    return "http://localhost:3000" + imagem;
+
+}
+
+
+/* ======================================================
+   CONTADOR
+====================================================== */
+
+function atualizarContador(){
+
+    let quantidade = 0;
+
+    carrinho.forEach(item => {
+
+        quantidade += Number(item.quantidade) || 1;
+
+    });
+
+    const contador =
+        document.getElementById("contadorCarrinho");
+
+    contador.textContent = quantidade;
+
+    if(quantidade === 0){
+
+        contador.style.display = "none";
+
+    }else{
+
+        contador.style.display = "flex";
+
+    }
+
+}
+
+
+/* ======================================================
+   MOSTRAR CARRINHO
+====================================================== */
+
+function mostrarCarrinho(){
+
+    const area =
+        document.getElementById("areaCarrinho");
+
+    atualizarContador();
+
+    if(carrinho.length === 0){
+
+        area.innerHTML = `
+
+            <div class="vazio">
+
+                <h2>Seu carrinho está vazio</h2>
+
+                <p>
+                    Escolha seus lanches favoritos no nosso cardápio.
+                </p>
+
+                <a href="cardapio.html">
+                    VOLTAR PARA O CARDÁPIO
+                </a>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let subtotal = 0;
+
+
+    let produtosHTML = "";
+
+
+    carrinho.forEach((item, index) => {
+
+        const quantidade =
+            Number(item.quantidade) || 1;
+
+        const preco =
+            Number(item.preco) || 0;
+
+        const totalItem =
+            preco * quantidade;
+
+        subtotal += totalItem;
+
+
+        let adicionaisHTML = "";
+
+        if(item.adicionais && item.adicionais.length > 0){
+
+            adicionaisHTML =
+                "Adicionais: " +
+                item.adicionais
+                    .map(adicional =>
+                        `${adicional.nome} (+R$ ${formatarPreco(adicional.preco)})`
+                    )
+                    .join(", ");
+
+        }
+
+
+        let observacaoHTML = "";
+
+        if(item.observacao){
+
+            observacaoHTML =
+                `Observação: ${item.observacao}`;
+
+        }
+
+
+        produtosHTML += `
+
+            <div class="item">
+
+                <div class="item-imagem">
+
+                    <img
+                        src="${pegarImagem(item.imagem)}"
+                        alt="${item.nome}"
+                        onerror="
+                            this.src='https://via.placeholder.com/500x300?text=Imagem+indisponível'
+                        "
+                    >
+
+                </div>
+
+
+                <div class="item-info">
+
+                    <h2>
+                        ${item.nome}
+                    </h2>
+
+                    <div class="preco-unitario">
+                        R$ ${formatarPreco(preco)} por unidade
+                    </div>
+
+
+                    ${
+                        adicionaisHTML
+                        ?
+                        `<div class="adicionais">
+                            ${adicionaisHTML}
+                        </div>`
+                        :
+                        ""
+                    }
+
+
+                    ${
+                        observacaoHTML
+                        ?
+                        `<div class="observacao">
+                            ${observacaoHTML}
+                        </div>`
+                        :
+                        ""
+                    }
+
+
+                    <div class="item-baixo">
+
+                        <div class="quantidade">
+
+                            <button onclick="alterarQuantidade(${index}, -1)">
+                                −
+                            </button>
+
+                            <span>
+                                ${quantidade}
+                            </span>
+
+                            <button onclick="alterarQuantidade(${index}, 1)">
+                                +
+                            </button>
+
+                        </div>
+
+
+                        <strong class="item-total">
+                            R$ ${formatarPreco(totalItem)}
+                        </strong>
+
+
+                        <button
+                            class="remover"
+                            onclick="removerItem(${index})"
+                        >
+                            Remover
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+
+    const total =
+        subtotal + TAXA_ENTREGA;
+
+
+    area.innerHTML = `
+
+        <div class="conteudo">
+
+            <div class="produtos">
+
+                ${produtosHTML}
+
+            </div>
+
+
+            <aside class="resumo">
+
+                <h2>
+                    Resumo do pedido
+                </h2>
+
+
+                <div class="linha">
+
+                    <span>
+                        Subtotal
+                    </span>
+
+                    <span>
+                        R$ ${formatarPreco(subtotal)}
+                    </span>
+
+                </div>
+
+
+                <div class="linha">
+
+                    <span>
+                        Entrega
+                    </span>
+
+                    <span>
+                        R$ ${formatarPreco(TAXA_ENTREGA)}
+                    </span>
+
+                </div>
+
+
+                <div class="linha total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <span class="total-valor">
+                        R$ ${formatarPreco(total)}
+                    </span>
+
+                </div>
+
+
+                <button
+                    class="btn-finalizar"
+                    onclick="finalizarPedido()"
+                >
+                    CONTINUAR PARA PAGAMENTO
+                </button>
+
+
+                <a
+                    class="btn-voltar"
+                    href="cardapio.html"
+                >
+                    ← Continuar comprando
+                </a>
+
+            </aside>
+
+        </div>
+
+
+        <section class="endereco">
+
+            <h2>
+                Endereço de entrega
+            </h2>
+
+
+            <div class="form-grid">
+
+                <div class="campo">
+
+                    <label for="rua">
+                        Rua
+                    </label>
+
+                    <input
+                        id="rua"
+                        type="text"
+                        placeholder="Digite sua rua"
+                    >
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="numero">
+                        Nº
+                    </label>
+
+                    <input
+                        id="numero"
+                        type="text"
+                        placeholder="Número"
+                    >
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="bairro">
+                        Bairro
+                    </label>
+
+                    <input
+                        id="bairro"
+                        type="text"
+                        placeholder="Digite seu bairro"
+                    >
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label for="cep">
+                        CEP
+                    </label>
+
+                    <input
+                        id="cep"
+                        type="text"
+                        placeholder="00000-000"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="pagamento">
+
+            <h2>
+                Forma de pagamento
+            </h2>
+
+
+            <div class="opcoes-pagamento">
+
+                <label class="opcao" onclick="selecionarPagamento(this, 'pix')">
+
+                    <input
+                        type="radio"
+                        name="pagamento"
+                        value="pix"
+                    >
+
+                    PIX
+
+                </label>
+
+
+                <label class="opcao" onclick="selecionarPagamento(this, 'cartao')">
+
+                    <input
+                        type="radio"
+                        name="pagamento"
+                        value="cartao"
+                    >
+
+                    CARTÃO
+
+                </label>
+
+
+                <label class="opcao" onclick="selecionarPagamento(this, 'dinheiro')">
+
+                    <input
+                        type="radio"
+                        name="pagamento"
+                        value="dinheiro"
+                    >
+
+                    DINHEIRO
+
+                </label>
+
+            </div>
+
+
+            <div id="areaTroco" class="troco">
+
+                <div class="campo">
+
+                    <label for="troco">
+                        Troco para quanto?
+                    </label>
+
+                    <input
+                        id="troco"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Ex: 100,00"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+    `;
+
+}
+
+
+/* ======================================================
+   ALTERAR QUANTIDADE
+====================================================== */
+
+function alterarQuantidade(index, valor){
+
+    if(!carrinho[index]){
+        return;
+    }
+
+
+    carrinho[index].quantidade =
+        (Number(carrinho[index].quantidade) || 1) + valor;
+
+
+    if(carrinho[index].quantidade <= 0){
+
+        carrinho.splice(index, 1);
+
+    }
+
+
+    salvarCarrinho();
+
+    mostrarCarrinho();
+
+}
+
+
+/* ======================================================
+   REMOVER ITEM
+====================================================== */
+
+function removerItem(index){
+
+    carrinho.splice(index, 1);
+
+    salvarCarrinho();
+
+    mostrarCarrinho();
+
+}
+
+
+/* ======================================================
+   SALVAR
+====================================================== */
+
+function salvarCarrinho(){
+
+    localStorage.setItem(
+        "carrinho",
+        JSON.stringify(carrinho)
+    );
+
+}
+
+
+/* ======================================================
+   PAGAMENTO
+====================================================== */
+
+function selecionarPagamento(elemento, tipo){
+
+    document
+        .querySelectorAll(".opcao")
+        .forEach(opcao => {
+
+            opcao.classList.remove("selecionada");
+
+        });
+
+
+    elemento.classList.add("selecionada");
+
+
+    const areaTroco =
+        document.getElementById("areaTroco");
+
+
+    if(tipo === "dinheiro"){
+
+        areaTroco.classList.add("mostrar");
+
+    }else{
+
+        areaTroco.classList.remove("mostrar");
+
+    }
+
+}
+
+
+/* ======================================================
+   FINALIZAR
+====================================================== */
+
+function finalizarPedido(){
+
+    if(carrinho.length === 0){
+
+        alert("Seu carrinho está vazio.");
+
+        return;
+
+    }
+
+
+    const rua =
+        document.getElementById("rua").value.trim();
+
+    const numero =
+        document.getElementById("numero").value.trim();
+
+    const bairro =
+        document.getElementById("bairro").value.trim();
+
+    const cep =
+        document.getElementById("cep").value.trim();
+
+
+    if(!rua || !numero || !bairro || !cep){
+
+        alert(
+            "Preencha o endereço de entrega."
+        );
+
+        return;
+
+    }
+
+
+    const pagamento =
+        document.querySelector(
+            'input[name="pagamento"]:checked'
+        );
+
+
+    if(!pagamento){
+
+        alert(
+            "Escolha uma forma de pagamento."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        pagamento.value === "dinheiro"
+    ){
+
+        const troco =
+            document.getElementById("troco").value;
+
+
+        if(!troco){
+
+            alert(
+                "Informe o valor para o troco."
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    /*
+        POR ENQUANTO:
+
+        O pedido ainda não é enviado
+        para a API.
+
+        Nesta primeira versão estamos
+        somente validando o carrinho.
+    */
+
+
+    alert(
+        "Pedido pronto para finalizar!\n\n" +
+        "Na próxima etapa vamos conectar " +
+        "esta tela com a API e salvar o pedido no banco."
+    );
+
+}
+
+
+/* ======================================================
+   INICIAR
+====================================================== */
+
+mostrarCarrinho();
+
+</script>
+
+</body>
+</html>

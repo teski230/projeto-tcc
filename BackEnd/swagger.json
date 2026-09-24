@@ -1,196 +1,775 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "API Lanchonete TCC",
-      "version": "1.0.0",
-      "description": "Documentação completa da API"
-    },
-    "servers": [
-      {
-        "url": "http://localhost:3000"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Rei do Rango",
+    "version": "1.0.0",
+    "description": "Documentação da API da hamburgueria Rei do Rango."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Servidor atual (localhost ou IP da rede)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
-    ],
-    "paths": {
-      "/clientes": {
-        "get": {
-          "summary": "Lista todos os clientes",
-          "responses": {
-            "200": {
-              "description": "Lista de clientes"
-            }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Verificar status da API",
+        "responses": {
+          "200": {
+            "description": "API online"
           }
         }
-      },
-  
-      "/clientes/{id}": {
-        "get": {
-          "summary": "Busca cliente por ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer"
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login do cliente",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "email": "cliente@email.com",
+                "senha": "123456"
               }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Cliente encontrado"
-            },
-            "404": {
-              "description": "Cliente não encontrado"
-            }
-          }
-        }
-      },
-  
-      "/verProdutos": {
-        "get": {
-          "summary": "Lista todos os produtos",
-          "responses": {
-            "200": {
-              "description": "Lista de produtos"
-            }
-          }
-        }
-      },
-  
-      "/produtos/{id}": {
-        "get": {
-          "summary": "Busca produto por ID",
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "integer"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Produto encontrado"
-            },
-            "404": {
-              "description": "Produto não encontrado"
-            }
-          }
-        }
-      },
-  
-      "/pedidos": {
-        "get": {
-          "summary": "Lista todos os pedidos",
-          "responses": {
-            "200": {
-              "description": "Lista de pedidos"
             }
           }
         },
-        "post": {
-          "summary": "Criar novo pedido",
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso"
+          },
+          "400": {
+            "description": "Email e senha obrigatórios"
+          },
+          "401": {
+            "description": "Email não encontrado ou senha incorreta"
+          },
+          "500": {
+            "description": "Erro interno no servidor"
+          }
+        }
+      }
+    },
+    "/cadastro": {
+      "post": {
+        "summary": "Cadastrar cliente",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "nome": "Felipe",
+                "email": "felipe@email.com",
+                "senha": "123456",
+                "bairro": "Centro",
+                "rua": "Rua A",
+                "telefone": "18999999999",
+                "N_casa": "123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cliente cadastrado com sucesso"
+          },
+          "400": {
+            "description": "Dados obrigatórios ou email já cadastrado"
+          },
+          "500": {
+            "description": "Erro interno no servidor"
+          }
+        }
+      }
+    },
+    "/produtos": {
+      "get": {
+        "summary": "Listar produtos",
+        "responses": {
+          "200": {
+            "description": "Lista de produtos"
+          },
+          "500": {
+            "description": "Erro ao buscar produtos"
+          }
+        }
+      }
+    },
+    "/verProdutos": {
+      "get": {
+        "summary": "Listar todos os produtos",
+        "description": "Rota alternativa que retorna todos os produtos cadastrados.",
+        "responses": {
+          "200": {
+            "description": "Produtos encontrados",
             "content": {
               "application/json": {
-                "example": {
-                  "id_cliente": 1,
-                  "bairro": "Centro",
-                  "rua": "Rua A",
-                  "numero": "123",
-                  "complemento": "Casa",
-                  "valor": 50.0,
-                  "telefone": "18999999999",
-                  "status": "pendente",
-                  "forma_pagamento": "dinheiro",
-                  "troco_para": 100
-                }
+                "example": [
+                  {
+                    "id_produto": 1,
+                    "nome": "X-Burguer",
+                    "descricao": "Hambúrguer com queijo",
+                    "preco": 18.5,
+                    "categoria": 1,
+                    "imagem": "/uploads/xburguer.jpg"
+                  }
+                ]
               }
             }
           },
-          "responses": {
-            "201": {
-              "description": "Pedido criado"
+          "500": {
+            "description": "Erro ao buscar produtos"
+          }
+        }
+      }
+    },
+    "/produtos/{id}": {
+      "get": {
+        "summary": "Buscar produto por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
             },
-            "500": {
-              "description": "Erro ao criar pedido"
-            }
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          },
+          "500": {
+            "description": "Erro ao buscar produto"
           }
         }
-      },
-  
-      "/cadastro": {
-        "post": {
-          "summary": "Cadastrar cliente",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "example": {
-                  "nome": "Felipe",
-                  "email": "felipe@email.com",
-                  "senha": "123456"
+      }
+    },
+    "/ADCprodutos": {
+      "post": {
+        "summary": "Adicionar produto",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "nome",
+                  "preco",
+                  "categoria"
+                ],
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "example": "X-Burguer"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "example": "Hambúrguer com queijo"
+                  },
+                  "preco": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 18.5
+                  },
+                  "categoria": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "imagem": {
+                    "type": "string",
+                    "format": "binary"
+                  }
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Produto adicionado com sucesso"
           },
-          "responses": {
-            "200": {
-              "description": "Cliente cadastrado"
+          "400": {
+            "description": "Dados inválidos ou categoria não encontrada"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao adicionar produto"
+          }
+        }
+      }
+    },
+    "/ATZprodutos/{id}": {
+      "put": {
+        "summary": "Atualizar produto",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "nome": "X-Salada",
+                "descricao": "Hambúrguer com salada",
+                "preco": 22.5,
+                "categoria": 1,
+                "imagem": "/uploads/xsalada.jpg"
+              }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Produto atualizado com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao atualizar produto"
+          }
+        }
+      }
+    },
+    "/DELprodutos/{id}": {
+      "delete": {
+        "summary": "Deletar produto",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto deletado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao deletar produto"
+          }
+        }
+      }
+    },
+    "/categorias": {
+      "get": {
+        "summary": "Listar categorias",
+        "responses": {
+          "200": {
+            "description": "Lista de categorias"
+          },
+          "500": {
+            "description": "Erro ao buscar categorias"
+          }
+        }
+      }
+    },
+    "/clientes": {
+      "get": {
+        "summary": "Listar clientes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de clientes"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao buscar clientes"
+          }
+        }
+      }
+    },
+    "/clientes/{id}": {
+      "get": {
+        "summary": "Buscar cliente por ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cliente encontrado"
+          },
+          "404": {
+            "description": "Cliente não encontrado"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/pedidos": {
+      "get": {
+        "summary": "Listar pedidos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pedidos"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao buscar pedidos"
           }
         }
       },
-  
-      "/entregadores": {
-        "post": {
-          "summary": "Cadastrar entregador",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "example": {
-                  "nome": "João",
-                  "email": "joao@email.com",
-                  "CNH": "123456789",
-                  "senha": "123456"
-                }
+      "post": {
+        "summary": "Criar pedido",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "id_cliente": 1,
+                "bairro": "Centro",
+                "rua": "Rua A",
+                "numero": "123",
+                "complemento": "Casa",
+                "valor": 50,
+                "telefone": "18999999999",
+                "forma_pagamento": "dinheiro",
+                "troco_para": 100
               }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Entregador cadastrado"
             }
           }
+        },
+        "responses": {
+          "201": {
+            "description": "Pedido criado com sucesso"
+          },
+          "400": {
+            "description": "Campos obrigatórios faltando"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao criar pedido"
+          }
         }
-      },
-  
-      "/ADCprodutos": {
-        "post": {
-          "summary": "Cadastrar produto",
-          "requestBody": {
+      }
+    },
+    "/pedidos/cliente/{id_cliente}": {
+      "get": {
+        "summary": "Listar pedidos de um cliente",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id_cliente",
+            "in": "path",
             "required": true,
-            "content": {
-              "application/json": {
-                "example": {
-                  "nome": "X-Burguer",
-                  "descricao": "Hamburguer com queijo",
-                  "preco": 15.0,
-                  "categoria": "Lanche"
-                }
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedidos encontrados"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao buscar pedidos"
+          }
+        }
+      }
+    },
+    "/pedidos/{id}/status": {
+      "put": {
+        "summary": "Atualizar status do pedido",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "status": "preparando"
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status atualizado com sucesso"
           },
-          "responses": {
-            "200": {
-              "description": "Produto cadastrado"
+          "400": {
+            "description": "Status inválido"
+          },
+          "404": {
+            "description": "Pedido não encontrado"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao atualizar status"
+          }
+        }
+      }
+    },
+    "/entregadores/solicitar": {
+      "post": {
+        "summary": "Solicitar cadastro de entregador",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "nome": "João da Silva",
+                "email": "joao@email.com",
+                "CNH": "123456789",
+                "senha": "123456"
+              }
             }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Solicitação enviada"
+          },
+          "400": {
+            "description": "Dados inválidos ou email já cadastrado"
+          },
+          "500": {
+            "description": "Erro ao solicitar cadastro"
+          }
+        }
+      }
+    },
+    "/entregadores/login": {
+      "post": {
+        "summary": "Login do entregador",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "email": "joao@email.com",
+                "senha": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso"
+          },
+          "400": {
+            "description": "Email e senha obrigatórios"
+          },
+          "401": {
+            "description": "Email ou senha incorretos"
+          },
+          "403": {
+            "description": "Cadastro pendente ou rejeitado"
+          },
+          "500": {
+            "description": "Erro interno no servidor"
+          }
+        }
+      }
+    },
+    "/entregadores": {
+      "get": {
+        "summary": "Listar entregadores",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de entregadores"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao buscar entregadores"
+          }
+        }
+      }
+    },
+    "/entregadores/pendentes": {
+      "get": {
+        "summary": "Listar entregadores pendentes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de entregadores pendentes"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao buscar entregadores pendentes"
+          }
+        }
+      }
+    },
+    "/entregadores/{id}/aprovar": {
+      "put": {
+        "summary": "Aprovar entregador",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entregador aprovado"
+          },
+          "404": {
+            "description": "Entregador não encontrado"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao aprovar entregador"
+          }
+        }
+      }
+    },
+    "/entregadores/{id}/rejeitar": {
+      "put": {
+        "summary": "Rejeitar entregador",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entregador rejeitado"
+          },
+          "404": {
+            "description": "Entregador não encontrado"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao rejeitar entregador"
+          }
+        }
+      }
+    },
+    "/entregadores/{id}/recusar": {
+      "put": {
+        "summary": "Recusar entregador",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entregador recusado"
+          },
+          "404": {
+            "description": "Entregador não encontrado"
+          },
+          "401": {
+            "description": "Token não fornecido"
+          },
+          "403": {
+            "description": "Token inválido ou expirado"
+          },
+          "500": {
+            "description": "Erro ao recusar entregador"
           }
         }
       }
     }
   }
+}

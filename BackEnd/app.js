@@ -5,11 +5,36 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
+const multer = require("multer");
 
 const app = express();
 const PORT = 3000;
 
 const api_chave = "sua_chave_secreta_aqui";
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "uploads/");
+    },
+
+    filename: function (req, file, cb) {
+        const nome = Date.now() + "-" + file.originalname;
+        cb(null, nome);
+    }
+});
+
+const upload = multer({
+    storage: storage
+});
+
+
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
 
 // ==================== MIDDLEWARES ====================
 
@@ -17,12 +42,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-app.use(
-    '/api-docs',
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerDocument)
-);
 
+app.use("/uploads", express.static("uploads"));
 
 // ==================== CONEXÃO COM BANCO ====================
 
@@ -275,8 +296,9 @@ app.get('/produtos/:id', async (req, res) => {
 
 // Adicionar produto
 
-app.post('/ADCprodutos', autenticarToken, async (req, res) => {
+// ==================== ADICIONAR PRODUTO ====================
 
+app.post('/ADCprodutos', autenticarToken, upload.single("imagem"), async (req, res) => {
     try {
 
         const {
@@ -286,42 +308,62 @@ app.post('/ADCprodutos', autenticarToken, async (req, res) => {
             categoria
         } = req.body;
 
-        if (!nome || !preco) {
+        if (!nome || !preco || !categoria) {
             return res.status(400).json({
                 success: false,
-                message: "Nome e preço são obrigatórios"
+                message: "Nome, preço e categoria são obrigatórios"
             });
         }
 
-        const sql = `
-            INSERT INTO produtos
-            (nome, descricao, preco, categoria)
-            VALUES (?, ?, ?, ?)
-        `;
+        // Verifica se a categoria existe
+        const [categoriaExiste] = await db.query(
+            "SELECT id_categoria FROM categorias WHERE id_categoria = ?",
+            [categoria]
+        );
 
+        if (categoriaExiste.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Categoria não encontrada"
+            });
+        }
+
+        // Caminho da imagem
+        let imagem = null;
+
+        if (req.file) {
+            imagem = "/uploads/" + req.file.filename;
+        }
+
+        // Cadastra o produto
         const [resultado] = await db.query(
-            sql,
+            `INSERT INTO produtos
+            (nome, descricao, preco, categoria, imagem)
+            VALUES (?, ?, ?, ?, ?)`,
             [
                 nome,
                 descricao || null,
                 preco,
-                categoria || null
+                categoria,
+                imagem
             ]
         );
 
         res.status(201).json({
             success: true,
             message: "Produto adicionado com sucesso",
-            id: resultado.insertId
+            id: resultado.insertId,
+            imagem: imagem
         });
 
     } catch (error) {
 
-        console.error("Erro ao adicionar produto:", error);
+        console.error("ERRO AO ADICIONAR PRODUTO:", error);
 
         res.status(500).json({
             success: false,
-            message: "Erro ao adicionar produto"
+            message: "Erro ao adicionar produto",
+            erro: error.message
         });
     }
 });
@@ -329,8 +371,9 @@ app.post('/ADCprodutos', autenticarToken, async (req, res) => {
 
 // Atualizar produto
 
-app.put('/ATZprodutos/:id', autenticarToken, async (req, res) => {
+// ==================== ATUALIZAR PRODUTO ====================
 
+app.put('/ATZprodutos/:id', autenticarToken, async (req, res) => {
     try {
 
         const { id } = req.params;
@@ -339,40 +382,62 @@ app.put('/ATZprodutos/:id', autenticarToken, async (req, res) => {
             nome,
             descricao,
             preco,
-            categoria
+            categoria,
+            imagem
         } = req.body;
 
-        const [existe] = await db.query(
+        if (!nome || !preco || !categoria) {
+            return res.status(400).json({
+                success: false,
+                message: "Nome, preço e categoria são obrigatórios"
+            });
+        }
+
+        // Verifica se o produto existe
+        const [produto] = await db.query(
             'SELECT id_produto FROM produtos WHERE id_produto = ?',
             [id]
         );
 
-        if (existe.length === 0) {
+        if (produto.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: "Produto não encontrado"
             });
         }
 
+        // Verifica a categoria
+        const [categoriaExiste] = await db.query(
+            'SELECT id_categoria FROM categorias WHERE id_categoria = ?',
+            [categoria]
+        );
+
+        if (categoriaExiste.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Categoria não encontrada"
+            });
+        }
+
         const sql = `
             UPDATE produtos
-            SET nome = ?,
+            SET
+                nome = ?,
                 descricao = ?,
                 preco = ?,
-                categoria = ?
+                categoria = ?,
+                imagem = ?
             WHERE id_produto = ?
         `;
 
-        await db.query(
-            sql,
-            [
-                nome,
-                descricao,
-                preco,
-                categoria,
-                id
-            ]
-        );
+        await db.query(sql, [
+            nome,
+            descricao || null,
+            preco,
+            categoria,
+            imagem || null,
+            id
+        ]);
 
         res.json({
             success: true,
@@ -381,12 +446,14 @@ app.put('/ATZprodutos/:id', autenticarToken, async (req, res) => {
 
     } catch (error) {
 
-        console.error("Erro ao atualizar produto:", error);
+        console.error("ERRO AO ATUALIZAR PRODUTO:", error);
 
         res.status(500).json({
             success: false,
-            message: "Erro ao atualizar produto"
+            message: "Erro ao atualizar produto",
+            erro: error.message
         });
+
     }
 });
 
@@ -455,6 +522,28 @@ app.get('/verProdutos', async (req, res) => {
     }
 });
 
+// ==================== CATEGORIAS ====================
+
+app.get('/categorias', async (req, res) => {
+    try {
+
+        const [rows] = await db.query(
+            'SELECT id_categoria, nome FROM categorias ORDER BY nome'
+        );
+
+        res.json(rows);
+
+    } catch (error) {
+
+        console.error("Erro ao buscar categorias:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Erro ao buscar categorias"
+        });
+
+    }
+});
 
 // ==================== CLIENTES ====================
 

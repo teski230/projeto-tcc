@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
@@ -83,9 +83,18 @@ h1 {
   justify-content: space-between;
 }
 
-input {
+input, select {
   padding: 6px;
   margin-right: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+select {
+  min-width: 170px;
+  background: white;
+  cursor: pointer;
 }
 
 .btn {
@@ -243,354 +252,441 @@ async function editar(id) {
   alert("Atualizado!");
 }
 
-async function carregarCategorias(){
+async function carregarCategorias() {
+
+  try {
 
     const res = await fetch("http://localhost:3000/categorias");
 
+    if (!res.ok) {
+      throw new Error("Erro ao buscar categorias");
+    }
+
     return await res.json();
 
+  } catch (erro) {
+
+    console.error("Erro ao carregar categorias:", erro);
+
+    return [];
+  }
 }
+
+
+function criarOptionsCategorias(categorias, categoriaSelecionada = "") {
+
+    let options = `
+        <option value="">
+            Selecione uma categoria
+        </option>
+    `;
+
+    categorias.forEach(categoria => {
+
+        options += `
+            <option
+                value="${categoria.id_categoria}"
+                ${String(categoria.id_categoria) === String(categoriaSelecionada) ? "selected" : ""}
+            >
+                ${categoria.nome}
+            </option>
+        `;
+
+    });
+
+    if (categorias.length === 0) {
+        options = `
+            <option value="">
+                Nenhuma categoria encontrada
+            </option>
+        `;
+    }
+
+    return options;
+} 
+
 
 async function listarProdutos() {
 
-  const res = await fetch("http://localhost:3000/produtos");
-  const produtos = await res.json();
+  try {
 
-  let html = `
-    <h2>Produtos</h2>
+    const res = await fetch("http://localhost:3000/produtos");
 
-    <br>
+    if (!res.ok) {
+      throw new Error("Erro ao buscar produtos");
+    }
 
-    <h3>Novo Produto</h3>
+    const produtos = await res.json();
 
-    <div class="card">
-      <div>
+    // As categorias são buscadas separadamente.
+    // Assim, mesmo com 0 produtos, o formulário aparece.
+    const categorias = await carregarCategorias();
 
-        <input id="novoNome" placeholder="Nome">
+    let html = `
+      <h2>Produtos</h2>
 
-        <input id="novoPreco" placeholder="Preço">
+      <br>
 
-        <input id="novaDescricao" placeholder="Descrição">
+      <h3>Novo Produto</h3>
 
-        <input id="novaImagem" placeholder="URL da Imagem">
-
-        <input id="novaCategoria" placeholder="Categoria">
-
-      </div>
-
-      <button class="btn" onclick="adicionarProduto()">
-        Adicionar
-      </button>
-
-    </div>
-
-    <br>
-  `;
-
-  produtos.forEach(p => {
-
-    html += `
       <div class="card">
 
         <div>
 
-          <input id="nome-${p.id_produto}" value="${p.nome}">
+          <input id="novoNome" placeholder="Nome">
 
           <input
-    id="preco-${p.id_produto}"
-    type="number"
-    step="0.01"
-    min="0"
-    value="${p.preco}">
+            id="novoPreco"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="Preço"
+          >
 
-          <input id="descricao-${p.id_produto}" value="${p.descricao}">
+          <input id="novaDescricao" placeholder="Descrição">
 
-          <input id="imagem-${p.id_produto}" value="${p.imagem}">
+          <input id="novaImagem" type="file" accept="image/*">
 
-          <select id="categoria-${p.id_produto}"></select>
-
-        </div>
-
-        <div>
-
-          <button class="btn" onclick="editarProduto(${p.id_produto})">
-            Salvar
-          </button>
-
-          <button class="btn" onclick="excluirProduto(${p.id_produto})">
-            Excluir
-          </button>
+          <select id="novaCategoria">
+            ${criarOptionsCategorias(categorias)}
+          </select>
 
         </div>
+
+        <button class="btn" onclick="adicionarProduto()">
+          Adicionar
+        </button>
 
       </div>
+
+      <br>
     `;
-  });
 
-  document.getElementById("conteudo").innerHTML = html;
+    if (produtos.length === 0) {
 
+      html += `
+        <div class="card">
+          Nenhum produto cadastrado ainda.
+        </div>
+      `;
+
+    } else {
+
+      produtos.forEach(p => {
+
+        html += `
+          <div class="card">
+
+            <div>
+
+              <input
+                id="nome-${p.id_produto}"
+                value="${p.nome || ""}"
+              >
+
+              <input
+                id="preco-${p.id_produto}"
+                type="number"
+                step="0.01"
+                min="0"
+                value="${p.preco || 0}"
+              >
+
+              <input
+                id="descricao-${p.id_produto}"
+                value="${p.descricao || ""}"
+              >
+
+              <input
+                id="imagem-${p.id_produto}"
+                value="${p.imagem || ""}"
+              >
+
+              <select id="categoria-${p.id_produto}">
+                ${criarOptionsCategorias(categorias, p.categoria)}
+              </select>
+
+            </div>
+
+            <div>
+
+              <button
+                class="btn"
+                onclick="editarProduto(${p.id_produto})"
+              >
+                Salvar
+              </button>
+
+              <button
+                class="btn"
+                onclick="excluirProduto(${p.id_produto})"
+              >
+                Excluir
+              </button>
+
+            </div>
+
+          </div>
+        `;
+
+      });
+    }
+
+    document.getElementById("conteudo").innerHTML = html;
+
+  } catch (erro) {
+
+    console.error("Erro ao carregar produtos:", erro);
+
+    document.getElementById("conteudo").innerHTML = `
+      <h2>Produtos</h2>
+
+      <div class="card">
+        Não foi possível carregar os produtos.
+      </div>
+    `;
+  }
 }
 
-async function adicionarProduto(){
 
-    const nome = document.getElementById("novoNome").value;
+async function adicionarProduto() {
+
+    const nome = document.getElementById("novoNome").value.trim();
     const preco = document.getElementById("novoPreco").value;
     const descricao = document.getElementById("novaDescricao").value;
-    const imagem = document.getElementById("novaImagem").value;
     const categoria = document.getElementById("novaCategoria").value;
 
-    await fetch("http://localhost:3000/produtos",{
+    const arquivoImagem =
+        document.getElementById("novaImagem").files[0];
 
-        method:"POST",
+    if (!nome) {
+        alert("Digite o nome do produto.");
+        return;
+    }
 
-        headers:{
-            "Content-Type":"application/json",
-            "Authorization":"Bearer "+token
-        },
+    if (!preco) {
+        alert("Digite o preço.");
+        return;
+    }
 
-        body:JSON.stringify({
-            nome,
-            preco,
-            descricao,
-            imagem,
-            categoria
-        })
+    if (!categoria) {
+        alert("Selecione uma categoria.");
+        return;
+    }
 
-    });
+    if (!arquivoImagem) {
+        alert("Selecione uma imagem.");
+        return;
+    }
 
-    alert("Produto cadastrado!");
+    try {
 
-    listarProdutos();
+        const formData = new FormData();
 
+        formData.append("nome", nome);
+        formData.append("preco", preco);
+        formData.append("descricao", descricao);
+        formData.append("categoria", categoria);
+        formData.append("imagem", arquivoImagem);
+
+        const res = await fetch(
+            "http://localhost:3000/ADCprodutos",
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+
+                body: formData
+            }
+        );
+
+        const dados = await res.json();
+
+        if (!res.ok) {
+            throw new Error(
+                dados.message || "Erro ao cadastrar produto"
+            );
+        }
+
+        alert("Produto cadastrado com sucesso!");
+
+        listarProdutos();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert(erro.message);
+    }
 }
 
-async function editarProduto(id){
 
-    const nome=document.getElementById(`nome-${id}`).value;
-    const preco=document.getElementById(`preco-${id}`).value;
-    const descricao=document.getElementById(`descricao-${id}`).value;
-    const imagem=document.getElementById(`imagem-${id}`).value;
-    const categoria=document.getElementById(`categoria-${id}`).value;
+async function editarProduto(id) {
 
-    await fetch(`http://localhost:3000/produtos/${id}`,{
+  const nome = document.getElementById(`nome-${id}`).value;
+  const preco = document.getElementById(`preco-${id}`).value;
+  const descricao = document.getElementById(`descricao-${id}`).value;
+  const imagem = document.getElementById(`imagem-${id}`).value;
+  const categoria = document.getElementById(`categoria-${id}`).value;
 
-        method:"PUT",
+  if (!categoria) {
+    alert("Selecione uma categoria.");
+    return;
+  }
 
-        headers:{
-            "Content-Type":"application/json",
-            "Authorization":"Bearer "+token
+  try {
+
+    const res = await fetch(
+      `http://localhost:3000/ATZprodutos/${id}`,
+      {
+        method: "PUT",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
         },
 
-        body:JSON.stringify({
-            nome,
-            preco,
-            descricao,
-            imagem,
-            categoria
+        body: JSON.stringify({
+          nome,
+          preco,
+          descricao,
+          imagem,
+          categoria: Number(categoria)
         })
+      }
+    );
 
-    });
+    const dados = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(
+        dados.message || "Erro ao atualizar produto"
+      );
+    }
 
     alert("Produto atualizado!");
 
     listarProdutos();
 
+  } catch (erro) {
+
+    console.error(erro);
+
+    alert(erro.message);
+  }
 }
 
-async function excluirProduto(id){
 
-    if(!confirm("Deseja excluir este produto?")) return;
+async function excluirProduto(id) {
 
-    await fetch(`http://localhost:3000/produtos/${id}`,{
+  if (!confirm("Deseja excluir este produto?")) return;
 
-        method:"DELETE",
+  try {
 
-        headers:{
-            "Authorization":"Bearer "+token
+    const res = await fetch(
+      `http://localhost:3000/DELprodutos/${id}`,
+      {
+        method: "DELETE",
+
+        headers: {
+          "Authorization": "Bearer " + token
         }
+      }
+    );
 
-    });
+    const dados = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(
+        dados.message || "Erro ao excluir produto"
+      );
+    }
 
     alert("Produto excluído!");
 
     listarProdutos();
 
+  } catch (erro) {
+
+    console.error(erro);
+
+    alert(erro.message);
+  }
 }
 
 // ENTREGADORES
 async function listarEntregadores() {
+  const pendentes = await fetch("http://localhost:3000/entregadores/pendentes", {
+    headers: { Authorization: "Bearer " + token }
+  }).then(r => r.json());
 
-    try {
+  const todos = await fetch("http://localhost:3000/entregadores", {
+    headers: { Authorization: "Bearer " + token }
+  }).then(r => r.json());
 
-        const res = await fetch("http://localhost:3000/entregadores", {
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        });
+  let html = "<h2>Solicitações Pendentes</h2><br>";
 
-        if (!res.ok) {
-            throw new Error("Erro ao buscar entregadores");
-        }
+  if (pendentes.length === 0) {
+    html += `<div class="card">Nenhuma solicitação pendente.</div>`;
+  } else {
+    pendentes.forEach(e => {
+      html += `
+        <div class="card-entregador" id="pendente-${e.id_entregador}">
+          <div class="info">
+            <p><b>${e.nome}</b></p>
+            <p>Email: ${e.email}</p>
+            <p>CNH: ${e.CNH} | Telefone: ${e.telefone}</p>
+            <p>Veículo: ${e.veiculo} - ${e.placa}</p>
+          </div>
+          <div class="acoes">
+            <button class="btn btn-aprovar" onclick="aprovarEntregador(${e.id_entregador})">Aprovar</button>
+            <button class="btn btn-recusar" onclick="recusarEntregador(${e.id_entregador})">Recusar</button>
+          </div>
+        </div>
+      `;
+    });
+  }
 
-        const entregadores = await res.json();
+  html += "<br><h2>Todos os Entregadores</h2><br>";
 
-        let html = `
-            <h2>Entregadores</h2>
-            <br>
-        `;
+  todos.forEach(e => {
+    html += `
+      <div class="card">
+        <div>
+          <b>${e.nome}</b> - ${e.email} - ${e.veiculo} (${e.placa})
+        </div>
+        <span class="badge badge-${e.status}">${e.status}</span>
+      </div>
+    `;
+  });
 
-        if (entregadores.length === 0) {
-
-            html += `
-                <div class="card">
-                    <p>Nenhum entregador cadastrado.</p>
-                </div>
-            `;
-
-        } else {
-
-            entregadores.forEach(e => {
-
-                html += `
-                    <div class="card-entregador">
-
-                        <div class="info">
-
-                            <p>
-                                <b>${e.nome}</b>
-                            </p>
-
-                            <p>
-                                Email: ${e.email}
-                            </p>
-
-                            <p>
-                                CNH: ${e.CNH || "Não informado"}
-                            </p>
-
-                            <p>
-                                Telefone: ${e.telefone || "Não informado"}
-                            </p>
-
-                            <p>
-                                Veículo: ${e.veiculo || "Não informado"}
-                            </p>
-
-                            <p>
-                                Placa: ${e.placa || "Não informado"}
-                            </p>
-
-                            <p>
-                                Status:
-                                <span class="badge badge-${e.status}">
-                                    ${e.status}
-                                </span>
-                            </p>
-
-                        </div>
-
-                        <div class="acoes">
-
-                            ${
-                                e.status === "pendente"
-                                ? `
-                                    <button
-                                        class="btn btn-aprovar"
-                                        onclick="aprovarEntregador(${e.id_entregador})">
-                                        Aprovar
-                                    </button>
-
-                                    <button
-                                        class="btn btn-recusar"
-                                        onclick="recusarEntregador(${e.id_entregador})">
-                                        Recusar
-                                    </button>
-                                `
-                                : ""
-                            }
-
-                        </div>
-
-                    </div>
-                `;
-            });
-        }
-
-        document.getElementById("conteudo").innerHTML = html;
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        document.getElementById("conteudo").innerHTML = `
-            <h2>Entregadores</h2>
-
-            <div class="card">
-                <p>Não foi possível carregar os entregadores.</p>
-                <p>Verifique se a API está funcionando.</p>
-            </div>
-        `;
-    }
+  document.getElementById("conteudo").innerHTML = html;
 }
 
-// APROVAR ENTREGADOR
 async function aprovarEntregador(id) {
+  if (!confirm("Aprovar este entregador? Ele poderá fazer login no app.")) return;
 
-    if (!confirm("Deseja aprovar este entregador?")) return;
+  await fetch(`http://localhost:3000/entregadores/${id}/aprovar`, {
+    method: "PUT",
+    headers: { Authorization: "Bearer " + token }
+  });
 
-    try {
-
-        const res = await fetch(`http://localhost:3000/entregadores/${id}/aprovar`, {
-            method: "PUT",
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        });
-
-        if (!res.ok) {
-            throw new Error("Erro ao aprovar entregador");
-        }
-
-        alert("Entregador aprovado!");
-
-        listarEntregadores();
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        alert("Não foi possível aprovar o entregador.");
-    }
+  alert("Entregador aprovado!");
+  listarEntregadores();
 }
 
-// RECUSAR ENTREGADOR
 async function recusarEntregador(id) {
+  if (!confirm("Recusar este entregador?")) return;
 
-    if (!confirm("Deseja recusar este entregador?")) return;
+  await fetch(`http://localhost:3000/entregadores/${id}/recusar`, {
+    method: "PUT",
+    headers: { Authorization: "Bearer " + token }
+  });
 
-    try {
-
-        const res = await fetch(`http://localhost:3000/entregadores/${id}/recusar`, {
-            method: "PUT",
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        });
-
-        if (!res.ok) {
-            throw new Error("Erro ao recusar entregador");
-        }
-
-        alert("Entregador recusado!");
-
-        listarEntregadores();
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        alert("Não foi possível recusar o entregador.");
-    }
+  alert("Entregador recusado.");
+  listarEntregadores();
 }
 
 // LOGOUT

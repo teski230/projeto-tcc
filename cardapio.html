@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Cardápio | Rei do Rango</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+
+/* ======================================================
+   GERAL
+====================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#f5f5f5;
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+header{
+    background:#ff0000;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 8%;
+    position:sticky;
+    top:0;
+    z-index:1000;
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+.logo img{
+    height:70px;
+    object-fit:contain;
+}
+
+nav{
+    display:flex;
+    gap:25px;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    font-weight:600;
+    transition:.3s;
+}
+
+nav a:hover{
+    opacity:.8;
+}
+
+.usuario{
+    display:flex;
+    align-items:center;
+}
+
+.btn-img{
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    position:relative;
+}
+
+.btn-img img{
+    width:50px;
+    display:block;
+}
+
+.btn-img:hover{
+    transform:scale(1.05);
+}
+
+/* ======================================================
+   CONTADOR DO CARRINHO
+====================================================== */
+
+.contador-carrinho{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+
+    background:white;
+    color:#ff0000;
+
+    min-width:23px;
+    height:23px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:12px;
+    font-weight:bold;
+
+    border:2px solid #ff0000;
+}
+
+/* ======================================================
+   BANNER
+====================================================== */
+
+.banner{
+    width:90%;
+    margin:30px auto;
+
+    background:#ff0000;
+    color:white;
+
+    border-radius:20px;
+    padding:40px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.banner h2{
+    font-family:'Bebas Neue';
+    font-size:55px;
+}
+
+.banner p{
+    margin-top:10px;
+    font-size:18px;
+}
+
+/* ======================================================
+   PESQUISA
+====================================================== */
+
+.pesquisa{
+    width:90%;
+    margin:auto;
+}
+
+.pesquisa input{
+    width:100%;
+    padding:18px;
+
+    border:none;
+    border-radius:12px;
+
+    outline:none;
+    font-size:16px;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+
+/* ======================================================
+   CATEGORIAS
+====================================================== */
+
+.categorias{
+    width:90%;
+    margin:25px auto;
+
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.categorias button{
+    background:white;
+    color:#444;
+
+    border:none;
+    border-radius:30px;
+
+    padding:12px 25px;
+
+    cursor:pointer;
+    transition:.3s;
+
+    font-weight:600;
+}
+
+.categorias button:hover{
+    background:#ff3131;
+    color:white;
+}
+
+.categorias button.ativa{
+    background:#ff3131;
+    color:white;
+}
+
+/* ======================================================
+   PRODUTOS
+====================================================== */
+
+#produtos{
+    width:90%;
+    margin:35px auto;
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+}
+
+.card{
+    background:white;
+
+    border-radius:15px;
+    overflow:hidden;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+
+    transition:.3s;
+
+    cursor:pointer;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+}
+
+.card img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.info{
+    padding:20px;
+}
+
+.info h2{
+    color:#ff3131;
+    font-size:24px;
+    margin-bottom:10px;
+}
+
+.info p{
+    color:#666;
+    font-size:14px;
+    margin-bottom:18px;
+
+    min-height:45px;
+}
+
+.preco{
+    font-size:25px;
+    color:#222;
+
+    font-weight:bold;
+
+    margin-bottom:20px;
+}
+
+.btn{
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+    border-radius:10px;
+
+    background:#ff3131;
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+    transition:.3s;
+}
+
+.btn:hover{
+    background:#d62828;
+}
+
+/* ======================================================
+   MENSAGEM
+====================================================== */
+
+.mensagem{
+    width:90%;
+    margin:40px auto;
+
+    text-align:center;
+
+    color:#666;
+    font-size:18px;
+}
+
+/* ======================================================
+   MODAL DO PRODUTO
+====================================================== */
+
+.modal{
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.55);
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    z-index:2000;
+
+    padding:20px;
+}
+
+.modal.aberto{
+    display:flex;
+}
+
+.modal-conteudo{
+    width:100%;
+    max-width:1100px;
+
+    max-height:90vh;
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    display:grid;
+
+    grid-template-columns:45% 55%;
+
+    position:relative;
+}
+
+/* ======================================================
+   BOTÃO FECHAR
+====================================================== */
+
+.fechar{
+    position:absolute;
+
+    right:20px;
+    top:15px;
+
+    background:white;
+
+    border:none;
+
+    width:40px;
+    height:40px;
+
+    border-radius:50%;
+
+    font-size:30px;
+
+    color:#777;
+
+    cursor:pointer;
+
+    z-index:10;
+}
+
+.fechar:hover{
+    color:#ff0000;
+}
+
+/* ======================================================
+   FOTO DO PRODUTO
+====================================================== */
+
+.produto-imagem{
+    background:white;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:35px;
+}
+
+.produto-imagem img{
+    width:100%;
+    max-height:600px;
+
+    object-fit:contain;
+}
+
+/* ======================================================
+   INFORMAÇÕES DO PRODUTO
+====================================================== */
+
+.produto-detalhes{
+    padding:35px;
+
+    overflow-y:auto;
+}
+
+.produto-detalhes h2{
+    font-size:32px;
+
+    color:#222;
+
+    margin-bottom:10px;
+}
+
+.produto-descricao{
+    color:#777;
+
+    font-size:15px;
+
+    margin-bottom:20px;
+}
+
+.produto-preco{
+    font-size:28px;
+
+    font-weight:bold;
+
+    color:#ff3131;
+
+    margin-bottom:25px;
+}
+
+/* ======================================================
+   ADICIONAIS
+====================================================== */
+
+.titulo-adicionais{
+    background:#f1f1f1;
+
+    padding:15px;
+
+    border-radius:8px;
+
+    margin-bottom:10px;
+}
+
+.titulo-adicionais h3{
+    font-size:18px;
+
+    color:#222;
+}
+
+.titulo-adicionais p{
+    font-size:13px;
+
+    color:#777;
+}
+
+.adicional{
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    padding:16px 5px;
+
+    border-bottom:1px solid #eee;
+}
+
+.adicional-info strong{
+    display:block;
+
+    font-size:15px;
+
+    color:#444;
+}
+
+.adicional-info span{
+    font-size:13px;
+
+    color:#888;
+}
+
+.adicional button{
+    border:none;
+
+    background:white;
+
+    color:#ff3131;
+
+    font-size:25px;
+
+    cursor:pointer;
+}
+
+.adicional.selecionado{
+    background:#fff4f4;
+}
+
+/* ======================================================
+   OBSERVAÇÃO
+====================================================== */
+
+.observacao{
+    margin-top:25px;
+}
+
+.observacao-topo{
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:8px;
+}
+
+.observacao label{
+    font-weight:600;
+
+    color:#555;
+}
+
+.contador-texto{
+    color:#999;
+
+    font-size:13px;
+}
+
+.observacao textarea{
+    width:100%;
+
+    height:100px;
+
+    resize:none;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    padding:15px;
+
+    outline:none;
+
+    font-size:14px;
+}
+
+.observacao textarea:focus{
+    border-color:#ff3131;
+}
+
+/* ======================================================
+   PARTE INFERIOR DO MODAL
+====================================================== */
+
+.modal-footer{
+    margin-top:25px;
+
+    padding-top:20px;
+
+    border-top:1px solid #eee;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:flex-end;
+
+    gap:15px;
+}
+
+.quantidade{
+    display:flex;
+
+    align-items:center;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    overflow:hidden;
+}
+
+.quantidade button{
+    width:45px;
+    height:48px;
+
+    border:none;
+
+    background:white;
+
+    color:#ff3131;
+
+    font-size:22px;
+
+    cursor:pointer;
+}
+
+.quantidade span{
+    width:40px;
+
+    text-align:center;
+
+    font-weight:600;
+}
+
+.btn-adicionar{
+    height:48px;
+
+    min-width:230px;
+
+    border:none;
+
+    border-radius:6px;
+
+    background:#ff3131;
+
+    color:white;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 18px;
+
+    font-size:15px;
+}
+
+.btn-adicionar:hover{
+    background:#d62828;
+}
+
+/* ======================================================
+   FOOTER
+====================================================== */
+
+footer{
+    margin-top:60px;
+
+    background:#222;
+
+    color:white;
+
+    text-align:center;
+
+    padding:25px;
+}
+
+/* ======================================================
+   RESPONSIVO
+====================================================== */
+
+@media(max-width:900px){
+
+    .banner{
+        flex-direction:column;
+        text-align:center;
+        gap:30px;
+    }
+
+    header{
+        flex-direction:column;
+        gap:20px;
+    }
+
+    nav{
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+
+    .modal-conteudo{
+        grid-template-columns:1fr;
+
+        max-height:95vh;
+    }
+
+    .produto-imagem{
+        padding:20px;
+
+        height:250px;
+    }
+
+    .produto-imagem img{
+        max-height:230px;
+    }
+
+    .produto-detalhes{
+        padding:25px;
+    }
+
+    .modal-footer{
+        flex-direction:column;
+    }
+
+    .quantidade{
+        width:100%;
+        justify-content:center;
+    }
+
+    .btn-adicionar{
+        width:100%;
+    }
+
+    .btn-voltar{
+    background: white;
+    color: #ff0000;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.btn-voltar:hover{
+    background: #f0f0f0;
+    transform: scale(1.03);
+}
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- ======================================================
+     HEADER
+====================================================== -->
+
+<header>
+
+    
+
+    <!-- LOGO -->
+    <div class="logo">
+        <img src="Rei do Rango (2).png" alt="Logo Rei do Rango">
+    </div>
+
+    <nav>
+        <a href="#">Cardápio</a>
+        <a href="#">Meus Pedidos</a>
+        <a href="#">Perfil</a>
+    </nav>
+
+    <div class="usuario">
+
+        <button
+            class="btn-img"
+            onclick="abrirCarrinho()"
+            title="Carrinho"
+        >
+
+            <img src="carrinho.png" alt="Carrinho">
+
+            <span
+                id="contadorCarrinho"
+                class="contador-carrinho"
+            >
+                0
+            </span>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- ======================================================
+     BANNER
+====================================================== -->
+
+<section class="banner">
+
+    <div>
+
+        <h2>
+            O melhor hambúrguer da cidade
+        </h2>
+
+        <p>
+            Escolha seu lanche favorito e faça seu pedido.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     PESQUISA
+====================================================== -->
+
+<section class="pesquisa">
+
+    <input
+        type="text"
+        id="pesquisa"
+        placeholder="Pesquisar lanche..."
+    >
+
+</section>
+
+
+<!-- ======================================================
+     CATEGORIAS
+====================================================== -->
+
+<section
+    class="categorias"
+    id="categorias"
+>
+
+    <button
+        class="ativa"
+        onclick="filtrarCategoria('todos', this)"
+    >
+        Todos
+    </button>
+
+</section>
+
+
+<!-- ======================================================
+     PRODUTOS
+====================================================== -->
+
+<div id="produtos">
+
+    <p class="mensagem">
+        Carregando produtos...
+    </p>
+
+</div>
+
+
+<!-- ======================================================
+     MODAL DO PRODUTO
+====================================================== -->
+
+<div
+    id="modalProduto"
+    class="modal"
+>
+
+    <div class="modal-conteudo">
+
+        <button
+            class="fechar"
+            onclick="fecharModal()"
+        >
+            ×
+        </button>
+
+
+        <!-- FOTO -->
+
+        <div class="produto-imagem">
+
+            <img
+                id="modalImagem"
+                src=""
+                alt="Produto"
+            >
+
+        </div>
+
+
+        <!-- DETALHES -->
+
+        <div class="produto-detalhes">
+
+            <h2 id="modalNome">
+                Produto
+            </h2>
+
+            <p
+                id="modalDescricao"
+                class="produto-descricao"
+            >
+            </p>
+
+            <div
+                id="modalPreco"
+                class="produto-preco"
+            >
+                R$ 0,00
+            </div>
+
+
+            <!-- ADICIONAIS -->
+
+            <div class="titulo-adicionais">
+
+                <h3>
+                    Deseja adicionar algum ingrediente?
+                </h3>
+
+                <p>
+                    Escolha os adicionais que quiser.
+                </p>
+
+            </div>
+
+
+            <div class="adicional">
+
+                <div class="adicional-info">
+
+                    <strong>
+                        Bacon
+                    </strong>
+
+                    <span>
+                        Adicionar bacon
+                    </span>
+
+                </div>
+
+                <button
+                    onclick="selecionarAdicional(this, 'Bacon', 5)"
+                >
+                    +
+                </button>
+
+            </div>
+
+
+            <div class="adicional">
+
+                <div class="adicional-info">
+
+                    <strong>
+                        Queijo
+                    </strong>
+
+                    <span>
+                        Adicionar queijo
+                    </span>
+
+                </div>
+
+                <button
+                    onclick="selecionarAdicional(this, 'Queijo', 3)"
+                >
+                    +
+                </button>
+
+            </div>
+
+
+            <div class="adicional">
+
+                <div class="adicional-info">
+
+                    <strong>
+                        Maionese
+                    </strong>
+
+                    <span>
+                        Adicionar maionese
+                    </span>
+
+                </div>
+
+                <button
+                    onclick="selecionarAdicional(this, 'Maionese', 2)"
+                >
+                    +
+                </button>
+
+            </div>
+
+
+            <div class="adicional">
+
+                <div class="adicional-info">
+
+                    <strong>
+                        Cebola
+                    </strong>
+
+                    <span>
+                        Adicionar cebola
+                    </span>
+
+                </div>
+
+                <button
+                    onclick="selecionarAdicional(this, 'Cebola', 1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+
+            <!-- OBSERVAÇÃO -->
+
+            <div class="observacao">
+
+                <div class="observacao-topo">
+
+                    <label>
+                        Algum comentário?
+                    </label>
+
+                    <span
+                        id="contadorObservacao"
+                        class="contador-texto"
+                    >
+                        0 / 140
+                    </span>
+
+                </div>
+
+                <textarea
+                    id="observacao"
+                    maxlength="140"
+                    placeholder="Ex: tirar cebola, maionese à parte etc."
+                    oninput="atualizarContador()"
+                ></textarea>
+
+            </div>
+
+
+            <!-- FOOTER DO MODAL -->
+
+            <div class="modal-footer">
+
+                <div class="quantidade">
+
+                    <button
+                        onclick="alterarQuantidade(-1)"
+                    >
+                        −
+                    </button>
+
+                    <span id="quantidadeProduto">
+                        1
+                    </span>
+
+                    <button
+                        onclick="alterarQuantidade(1)"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="btn-adicionar"
+                    onclick="adicionarProdutoAoCarrinho()"
+                >
+
+                    <span>
+                        Adicionar
+                    </span>
+
+                    <strong id="precoFinal">
+                        R$ 0,00
+                    </strong>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer>
+
+    © 2026 Rei do Rango - Todos os direitos reservados.
+
+</footer>
+
+
+<script>
+
+/* ======================================================
+   CONFIGURAÇÃO
+====================================================== */
+
+const API = "http://localhost:3000";
+
+let todosProdutos = [];
+
+let categoriaAtual = "todos";
+
+let produtoSelecionado = null;
+
+let quantidadeAtual = 1;
+
+let adicionaisSelecionados = [];
+
+
+/* ======================================================
+   CARREGAR PRODUTOS
+====================================================== */
+
+async function carregarProdutos(){
+
+    try{
+
+        const resposta =
+            await fetch(`${API}/verProdutos`);
+
+        if(!resposta.ok){
+
+            throw new Error(
+                "Erro ao buscar produtos"
+            );
+
+        }
+
+        const produtos =
+            await resposta.json();
+
+        todosProdutos = produtos;
+
+        mostrarProdutos(todosProdutos);
+
+    }catch(erro){
+
+        console.error(
+            "Erro ao carregar produtos:",
+            erro
+        );
+
+        document.getElementById("produtos").innerHTML = `
+
+            <div class="mensagem">
+
+                <p>
+                    Não foi possível carregar o cardápio.
+                </p>
+
+                <p>
+                    Verifique se a API está funcionando.
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* ======================================================
+   MOSTRAR PRODUTOS
+====================================================== */
+
+function mostrarProdutos(produtos){
+
+    const area =
+        document.getElementById("produtos");
+
+    area.innerHTML = "";
+
+
+    if(produtos.length === 0){
+
+        area.innerHTML = `
+
+            <div class="mensagem">
+
+                <p>
+                    Nenhum produto encontrado.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    produtos.forEach(produto => {
+
+        let imagem = produto.imagem;
+
+
+        if(imagem){
+
+            if(!imagem.startsWith("http")){
+
+                imagem = API + imagem;
+
+            }
+
+        }else{
+
+            imagem =
+                "https://via.placeholder.com/500x300?text=Rei+do+Rango";
+
+        }
+
+
+        area.innerHTML += `
+
+            <div
+                class="card"
+                onclick="abrirProduto(${produto.id_produto})"
+            >
+
+                <img
+                    src="${imagem}"
+                    alt="${produto.nome}"
+                    onerror="
+                        this.src='https://via.placeholder.com/500x300?text=Imagem+indisponível'
+                    "
+                >
+
+                <div class="info">
+
+                    <h2>
+                        ${produto.nome}
+                    </h2>
+
+                    <p>
+                        ${
+                            produto.descricao ||
+                            "Delicioso lanche do Rei do Rango."
+                        }
+                    </p>
+
+                    <div class="preco">
+
+                        R$
+                        ${Number(produto.preco)
+                            .toFixed(2)
+                            .replace(".", ",")}
+
+                    </div>
+
+                    <button
+                        class="btn"
+                        onclick="
+                            event.stopPropagation();
+                            abrirProduto(${produto.id_produto});
+                        "
+                    >
+                        Ver produto
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* ======================================================
+   ABRIR PRODUTO
+====================================================== */
+
+function abrirProduto(id){
+
+    produtoSelecionado =
+        todosProdutos.find(
+            produto =>
+                Number(produto.id_produto) === Number(id)
+        );
+
+
+    if(!produtoSelecionado){
+
+        return;
+
+    }
+
+
+    quantidadeAtual = 1;
+
+    adicionaisSelecionados = [];
+
+
+    document.getElementById(
+        "quantidadeProduto"
+    ).textContent = 1;
+
+
+    document.getElementById(
+        "observacao"
+    ).value = "";
+
+
+    document.getElementById(
+        "contadorObservacao"
+    ).textContent = "0 / 140";
+
+
+    /* ==============================
+       DADOS DO PRODUTO
+    ============================== */
+
+    let imagem =
+        produtoSelecionado.imagem;
+
+
+    if(imagem){
+
+        if(!imagem.startsWith("http")){
+
+            imagem = API + imagem;
+
+        }
+
+    }else{
+
+        imagem =
+            "https://via.placeholder.com/500x300?text=Rei+do+Rango";
+
+    }
+
+
+    document.getElementById(
+        "modalImagem"
+    ).src = imagem;
+
+
+    document.getElementById(
+        "modalNome"
+    ).textContent =
+        produtoSelecionado.nome;
+
+
+    document.getElementById(
+        "modalDescricao"
+    ).textContent =
+        produtoSelecionado.descricao ||
+        "Delicioso lanche do Rei do Rango.";
+
+
+    /* ==============================
+       RESETAR ADICIONAIS
+    ============================== */
+
+    document.querySelectorAll(
+        ".adicional"
+    ).forEach(item => {
+
+        item.classList.remove(
+            "selecionado"
+        );
+
+    });
+
+
+    atualizarPreco();
+
+
+    document.getElementById(
+        "modalProduto"
+    ).classList.add("aberto");
+
+
+    document.body.style.overflow =
+        "hidden";
+
+}
+
+
+/* ======================================================
+   FECHAR MODAL
+====================================================== */
+
+function fecharModal(){
+
+    document.getElementById(
+        "modalProduto"
+    ).classList.remove("aberto");
+
+    document.body.style.overflow =
+        "auto";
+
+}
+
+
+/* ======================================================
+   FECHAR CLICANDO FORA
+====================================================== */
+
+document.getElementById(
+    "modalProduto"
+).addEventListener(
+    "click",
+    function(event){
+
+        if(event.target === this){
+
+            fecharModal();
+
+        }
+
+    }
+);
+
+
+/* ======================================================
+   TECLA ESC
+====================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key === "Escape"){
+
+            fecharModal();
+
+        }
+
+    }
+);
+
+
+/* ======================================================
+   QUANTIDADE
+====================================================== */
+
+function alterarQuantidade(valor){
+
+    quantidadeAtual += valor;
+
+
+    if(quantidadeAtual < 1){
+
+        quantidadeAtual = 1;
+
+    }
+
+
+    document.getElementById(
+        "quantidadeProduto"
+    ).textContent =
+        quantidadeAtual;
+
+
+    atualizarPreco();
+
+}
+
+
+/* ======================================================
+   ADICIONAIS
+====================================================== */
+
+function selecionarAdicional(
+    botao,
+    nome,
+    preco
+){
+
+    const adicionalExistente =
+        adicionaisSelecionados.find(
+            adicional =>
+                adicional.nome === nome
+        );
+
+
+    const elemento =
+        botao.closest(".adicional");
+
+
+    if(adicionalExistente){
+
+        adicionaisSelecionados =
+            adicionaisSelecionados.filter(
+                adicional =>
+                    adicional.nome !== nome
+            );
+
+        elemento.classList.remove(
+            "selecionado"
+        );
+
+        botao.textContent = "+";
+
+    }else{
+
+        adicionaisSelecionados.push({
+
+            nome: nome,
+            preco: preco
+
+        });
+
+        elemento.classList.add(
+            "selecionado"
+        );
+
+        botao.textContent = "✓";
+
+    }
+
+
+    atualizarPreco();
+
+}
+
+
+/* ======================================================
+   ATUALIZAR PREÇO
+====================================================== */
+
+function atualizarPreco(){
+
+    if(!produtoSelecionado){
+
+        return;
+
+    }
+
+
+    let precoBase =
+        Number(produtoSelecionado.preco);
+
+
+    let precoAdicionais =
+        adicionaisSelecionados.reduce(
+            (total, adicional) =>
+                total + Number(adicional.preco),
+            0
+        );
+
+
+    let precoUnitario =
+        precoBase + precoAdicionais;
+
+
+    let precoTotal =
+        precoUnitario * quantidadeAtual;
+
+
+    document.getElementById(
+        "modalPreco"
+    ).textContent =
+        "R$ " +
+        precoBase
+            .toFixed(2)
+            .replace(".", ",");
+
+
+    document.getElementById(
+        "precoFinal"
+    ).textContent =
+        "R$ " +
+        precoTotal
+            .toFixed(2)
+            .replace(".", ",");
+
+}
+
+
+/* ======================================================
+   CONTADOR DA OBSERVAÇÃO
+====================================================== */
+
+function atualizarContador(){
+
+    const texto =
+        document.getElementById(
+            "observacao"
+        ).value;
+
+
+    document.getElementById(
+        "contadorObservacao"
+    ).textContent =
+        `${texto.length} / 140`;
+
+}
+
+
+/* ======================================================
+   ADICIONAR AO CARRINHO
+====================================================== */
+
+function adicionarProdutoAoCarrinho(){
+
+    if(!produtoSelecionado){
+
+        return;
+
+    }
+
+
+    let carrinho =
+        JSON.parse(
+            localStorage.getItem("carrinho")
+        ) || [];
+
+
+    const observacao =
+        document.getElementById(
+            "observacao"
+        ).value.trim();
+
+
+    const adicionais =
+        adicionaisSelecionados.map(
+            adicional => ({
+                nome: adicional.nome,
+                preco: adicional.preco
+            })
+        );
+
+
+    const precoBase =
+        Number(produtoSelecionado.preco);
+
+
+    const precoAdicionais =
+        adicionais.reduce(
+            (total, adicional) =>
+                total + Number(adicional.preco),
+            0
+        );
+
+
+    const precoUnitario =
+        precoBase + precoAdicionais;
+
+
+    /*
+       Cada configuração diferente
+       será um item separado no carrinho.
+    */
+
+    carrinho.push({
+
+        id_produto:
+            produtoSelecionado.id_produto,
+
+        nome:
+            produtoSelecionado.nome,
+
+        descricao:
+            produtoSelecionado.descricao,
+
+        imagem:
+            produtoSelecionado.imagem,
+
+        quantidade:
+            quantidadeAtual,
+
+        preco:
+            precoUnitario,
+
+        precoBase:
+            precoBase,
+
+        adicionais:
+            adicionais,
+
+        observacao:
+            observacao
+
+    });
+
+
+    localStorage.setItem(
+        "carrinho",
+        JSON.stringify(carrinho)
+    );
+
+
+    atualizarContadorCarrinho();
+
+
+    fecharModal();
+
+
+    alert(
+        `${produtoSelecionado.nome} foi adicionado ao carrinho!`
+    );
+
+}
+
+
+/* ======================================================
+   CONTADOR DO CARRINHO
+====================================================== */
+
+function atualizarContadorCarrinho(){
+
+    let carrinho =
+        JSON.parse(
+            localStorage.getItem("carrinho")
+        ) || [];
+
+
+    let quantidadeTotal = 0;
+
+
+    carrinho.forEach(item => {
+
+        /*
+           Compatibilidade com produtos
+           antigos que não tinham quantidade.
+        */
+
+        quantidadeTotal +=
+            Number(item.quantidade) || 1;
+
+    });
+
+
+    const contador =
+        document.getElementById(
+            "contadorCarrinho"
+        );
+
+
+    contador.textContent =
+        quantidadeTotal;
+
+
+    if(quantidadeTotal === 0){
+
+        contador.style.display =
+            "none";
+
+    }else{
+
+        contador.style.display =
+            "flex";
+
+    }
+
+}
+
+
+/* ======================================================
+   CARRINHO
+====================================================== */
+
+function abrirCarrinho(){
+
+    /*
+       Por enquanto vamos deixar o botão
+       preparado para a próxima etapa.
+
+       Na próxima etapa vamos criar:
+       carrinho.html
+    */
+
+    window.location.href =
+        "carrinho.html";
+
+}
+
+
+/* ======================================================
+   CARREGAR CATEGORIAS
+====================================================== */
+
+async function carregarCategorias(){
+
+    try{
+
+        const resposta =
+            await fetch(`${API}/categorias`);
+
+
+        if(!resposta.ok){
+
+            throw new Error(
+                "Erro ao buscar categorias"
+            );
+
+        }
+
+
+        const categorias =
+            await resposta.json();
+
+
+        const area =
+            document.getElementById(
+                "categorias"
+            );
+
+
+        categorias.forEach(categoria => {
+
+            area.innerHTML += `
+
+                <button
+                    onclick="
+                        filtrarCategoria(
+                            ${categoria.id_categoria},
+                            this
+                        )
+                    "
+                >
+                    ${categoria.nome}
+                </button>
+
+            `;
+
+        });
+
+    }catch(erro){
+
+        console.error(
+            "Erro ao carregar categorias:",
+            erro
+        );
+
+    }
+
+}
+
+
+/* ======================================================
+   FILTRAR CATEGORIA
+====================================================== */
+
+function filtrarCategoria(
+    categoria,
+    botao
+){
+
+    categoriaAtual =
+        categoria;
+
+
+    document
+        .querySelectorAll(
+            ".categorias button"
+        )
+        .forEach(btn => {
+
+            btn.classList.remove(
+                "ativa"
+            );
+
+        });
+
+
+    botao.classList.add(
+        "ativa"
+    );
+
+
+    let produtosFiltrados;
+
+
+    if(categoria === "todos"){
+
+        produtosFiltrados =
+            todosProdutos;
+
+    }else{
+
+        produtosFiltrados =
+            todosProdutos.filter(
+                produto => {
+
+                    return Number(
+                        produto.categoria
+                    ) === Number(
+                        categoria
+                    );
+
+                }
+            );
+
+    }
+
+
+    mostrarProdutos(
+        produtosFiltrados
+    );
+
+}
+
+
+/* ======================================================
+   PESQUISA
+====================================================== */
+
+document
+    .getElementById("pesquisa")
+    .addEventListener(
+        "input",
+        function(){
+
+            const texto =
+                this.value.toLowerCase();
+
+
+            let produtosFiltrados =
+                todosProdutos.filter(
+                    produto => {
+
+                        const nome =
+                            (
+                                produto.nome ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const descricao =
+                            (
+                                produto.descricao ||
+                                ""
+                            ).toLowerCase();
+
+
+                        const combinaPesquisa =
+                            nome.includes(texto) ||
+                            descricao.includes(texto);
+
+
+                        const combinaCategoria =
+                            categoriaAtual === "todos" ||
+                            Number(
+                                produto.categoria
+                            ) === Number(
+                                categoriaAtual
+                            );
+
+
+                        return (
+                            combinaPesquisa &&
+                            combinaCategoria
+                        );
+
+                    }
+                );
+
+
+            mostrarProdutos(
+                produtosFiltrados
+            );
+
+        }
+    );
+
+
+/* ======================================================
+   INICIAR
+====================================================== */
+
+carregarCategorias();
+
+carregarProdutos();
+
+atualizarContadorCarrinho();
+
+</script>
+
+</body>
+
+</html>
